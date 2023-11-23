@@ -6,3 +6,5 @@ editor: visual
 ---
 
 ## Link to the github repository : [here](https://github.com/briandekorodi/NewYorkShootings)
+
+## Link to the sources : [here](https://catalog.data.gov/dataset/nypd-shooting-incident-data-historic/resource/c564b578-fd8a-4005-8365-34150d306cc4)
