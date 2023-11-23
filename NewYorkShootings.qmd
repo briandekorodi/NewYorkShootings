@@ -7,14 +7,20 @@ editor: visual
 
 # Gun violence in the Big Apple: How shooting incidents help to tell the story of New York City over the last 15 years.
 
-A city of bright lights and big dreams, New York\'s history is also one of crime, violence and social inequality. This is why we will attempt to tell the story of New York City through the lens of its shooting incidents.
+A city of bright lights and big dreams, New York's history is also one of crime, violence and social inequality. This is why we will attempt to tell the story of New York City through the lens of its shooting incidents.
 
 Through geographical, sociodemographic and temporal aspects of reported shooting incidents in New York City, we attempt to find relevant trends that might align with social and economic developments between 2006 and 2022.
 
-We have found certified data with detailed descriptive characteristics of all reported shooting incidents, including date, time, location, victim and offender\'s characteristics. This will allow us to summarize the quantity of shooting incidents as a function of these characteristics, along with their evolution over the given timeframe. Where significant patterns reveal themselves, we will attempt to use external information to help explain these patterns in light of various contextual factors, such as political, social, or economic evolutions. 
+We have found certified data with detailed descriptive characteristics of all reported shooting incidents, including date, time, location, victim and offender's characteristics. This will allow us to summarize the quantity of shooting incidents as a function of these characteristics, along with their evolution over the given timeframe. Where significant patterns reveal themselves, we will attempt to use external information to help explain these patterns in light of various contextual factors, such as political, social, or economic evolutions. 
 
 This method, combining descriptive data with contextual information, we hope, will allow us to determine to what extent gun violence incidents are random events, or whether they may be partially explained by larger social and economic forces.
 
 ## Link to the github repository : [here](https://github.com/briandekorodi/NewYorkShootings)
 
-## Link to the sources : [here](https://catalog.data.gov/dataset/nypd-shooting-incident-data-historic/resource/c564b578-fd8a-4005-8365-34150d306cc4)
+## Link to the source : [here](https://catalog.data.gov/dataset/nypd-shooting-incident-data-historic/resource/c564b578-fd8a-4005-8365-34150d306cc4)
+
+## Description of the source : 
+
+The data, found in the official United States open data website, constitutes a list of every New York City shooting incident, reported by the NYPD, from January 1, 2006 to Decemeber 31, 2022. This data is manually extracted every quarter and reviewed by the Office of Management Analysis and Planning before being posted on the NYPD website.
+
+For each observation, corresponding to a unique shooting incident, is provided information relative to the date, time and localisation of the incident, as well as sociodemographic characteristics of the offender and victim.
