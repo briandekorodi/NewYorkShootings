@@ -15,11 +15,11 @@ We have found certified data with detailed descriptive characteristics of all re
 
 This method, combining descriptive data with contextual information, we hope, will allow us to determine to what extent gun violence incidents are random events, or whether they may be partially explained by larger social and economic forces.
 
-## Link to the github repository : [here](https://github.com/briandekorodi/NewYorkShootings)
+## Click [here](https://github.com/briandekorodi/NewYorkShootings) to access the Github repository
 
-## Link to the source : [here](https://catalog.data.gov/dataset/nypd-shooting-incident-data-historic/resource/c564b578-fd8a-4005-8365-34150d306cc4)
+## Click [here](https://catalog.data.gov/dataset/nypd-shooting-incident-data-historic/resource/c564b578-fd8a-4005-8365-34150d306cc4) to access the source
 
-## Description of the source : 
+## Description of the source :
 
 The data, found in the official United States open data website, constitutes a list of every New York City shooting incident, reported by the NYPD, from January 1, 2006 to Decemeber 31, 2022. This data is manually extracted every quarter and reviewed by the Office of Management Analysis and Planning before being posted on the NYPD website.
 
