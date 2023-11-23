@@ -1,0 +1,8 @@
+---
+title: "NewYorkShootings"
+author: "Brian de Korodi & Mariane Modena"
+format: html
+editor: visual
+---
+
+## 
