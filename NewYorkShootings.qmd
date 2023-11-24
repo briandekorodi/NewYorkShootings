@@ -68,3 +68,15 @@ For each observation, corresponding to a unique shooting incident, is provided i
 **Longitude** : Geographical longitude coordinate of the location at which the shooting incident occurred
 
 **Lon_Lat** : Geographical point, composed of latitude and longitude coordinates, of the location at which the shooting incident occurred
+
+```{r}
+here::i_am("NewYorkShootings.Rproj")
+```
+
+```{r}
+library(vroom)
+```
+
+```{r}
+raw_data <- vroom("data/NYPD_Shooting_Incident_Data__Historic.csv")
+```
