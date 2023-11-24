@@ -31,7 +31,7 @@ For each observation, corresponding to a unique shooting incident, is provided i
 
 **OCCUR_DATE** : Date (Month/Day/Year) on which the incident occurred
 
-**OCCUR_TIME** : Time at which the incident occurred
+**OCCUR_TIME** : Time at which the incident occured
 
 **BORO** : Which of the 5 New York City boroughs the incident occurred in (Manhattan, Queens, Brooklyn, Bronx, Staten Island)
 
@@ -97,4 +97,140 @@ basic_info <- raw_data |>
             "Number of variables" = ncol(raw_data),)
 knitr::kable(basic_info)
 
+```
+
+## Data Cleaning
+
+```{r}
+raw_data |> distinct(LOCATION_DESC)
+```
+
+The dataset contains some missing values for which it is NA and some for which it is "(null)". We replace all the "(null)" values by NA.
+
+```{r}
+clean_data <- 
+raw_data[raw_data == "(null)"] <- NA
+```
+
+The variable OCCUR_TIME has a double type, which is not very readable. We change the format of this variable to the classic format of Hour:Minutes:Seconds.
+
+```{r}
+typeof(raw_data$OCCUR_TIME) 
+```
+
+The variable OCCUR_TIME has a double type, which is not very readable. We us as_hms to convert it from double to time.
+
+```{r}
+library(hms)
+raw_data$OCCUR_TIME <- as_hms(raw_data$OCCUR_TIME)
+```
+
+```{r}
+raw_data |> select(OCCUR_TIME) |> all(as_hms())
+```
+
+```{r}
+typeof(raw_data$VIC_AGE_GROUP)
+```
+
+```{r}
+raw_data |> distinct(VIC_AGE_GROUP)
+```
+
+```{r}
+raw_data[raw_data == "UNKNOWN"] <- NA
+```
+
+```{r}
+raw_data |> distinct(VIC_AGE_GROUP)
+```
+
+```{r}
+raw_data$VIC_AGE_GROUP[raw_data$VIC_AGE_GROUP == 1022] <- NA
+```
+
+```{r}
+raw_data |> distinct(VIC_AGE_GROUP)
+```
+
+```{r}
+raw_data |> distinct(PERP_AGE_GROUP)
+```
+
+```{r}
+raw_data$PERP_AGE_GROUP[is.element(raw_data$PERP_AGE_GROUP, c(1020, 940,224))] <- NA
+
+```
+
+```{r}
+raw_data |> distinct(PERP_AGE_GROUP)
+```
+
+```{r}
+raw_data |> distinct(LOC_OF_OCCUR_DESC)
+```
+
+```{r}
+raw_data |> distinct(LOC_CLASSFCTN_DESC)
+```
+
+```{r}
+raw_data$LOC_CLASSFCTN_DESC[raw_data$LOC_CLASSFCTN_DESC == "OTHER"] <- NA
+```
+
+```{r}
+raw_data |> distinct(LOC_CLASSFCTN_DESC)
+```
+
+```{r}
+raw_data |> distinct(LOCATION_DESC)
+```
+
+```{r}
+raw_data$LOCATION_DESC[raw_data$LOCATION_DESC == "NONE"] <- NA
+```
+
+```{r}
+raw_data$LOCATION_DESC[raw_data$LOCATION_DESC == "MULTI DWELL - PUBLIC HOUS"] <- "MULTI DWELL - PUBLIC HOUSE"
+raw_data$LOCATION_DESC[raw_data$LOCATION_DESC == "SOCIAL CLUB/POLICY LOCATI"] <- "SOCIAL CLUB/POLICY LOCATION"
+```
+
+```{r}
+raw_data |> distinct(LOCATION_DESC)
+```
+
+```{r}
+raw_data |> distinct(STATISTICAL_MURDER_FLAG)
+```
+
+```{r}
+raw_data |> distinct(PERP_SEX)
+```
+
+```{r}
+raw_data$PERP_SEX[raw_data$PERP_SEX == "U"] <- NA
+```
+
+```{r}
+raw_data |> distinct(PERP_SEX)
+```
+
+```{r}
+raw_data |> distinct(VIC_SEX)
+```
+
+```{r}
+raw_data$VIC_SEX[raw_data$VIC_SEX == "U"] <- NA
+```
+
+```{r}
+raw_data |> distinct(VIC_SEX)
+```
+
+```{r}
+raw_data |> distinct(VIC_RACE)
+```
+
+```{r}
+raw_data |> distinct(PERP_RACE)
 ```
