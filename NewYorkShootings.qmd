@@ -23,4 +23,48 @@ This method, combining descriptive data with contextual information, we hope, wi
 
 The data, found in the official United States open data website, constitutes a list of every New York City shooting incident, reported by the NYPD, from January 1, 2006 to Decemeber 31, 2022. This data is manually extracted every quarter and reviewed by the Office of Management Analysis and Planning before being posted on the NYPD website.
 
-For each observation, corresponding to a unique shooting incident, is provided information relative to the date, time and localisation of the incident, as well as sociodemographic characteristics of the offender and victim.
+For each observation, corresponding to a unique shooting incident, is provided information relative to the date, time and localisation of the incident, as well as socio-demographic characteristics of the offender and victim.
+
+## Description of the variables :
+
+**INCIDENT_KEY** : Serial number identifying the incident
+
+**OCCUR_DATE** : Date (Month/Day/Year) on which the incident occurred
+
+**OCCUR_TIME** : Time at which the incident occurred
+
+**BORO** : Which of the 5 New York City boroughs the incident occurred in (Manhattan, Queens, Brooklyn, Bronx, Staten Island)
+
+**LOC_OF_OCCUR_DESC** : Most general category of location, whether the incident occurred inside ,outside, or unknown
+
+**PRECINCT** : Code identifying which NYPD precinct in which the incident occurred
+
+**JURISDICTION_CODE** : Code identifying the tax jurisdiction territory in which the incident occurred
+
+**LOC_CLASSFCTN_DESC** : Second most general category of location
+
+**LOCATION_DESC** : Third most general category of location
+
+**STATISTICAL_MURDER_FLAG** : TRUE/FALSE variable indicating whether the shooting resulted in a murder
+
+**PERP_AGE_GROUP** : Age range of the offender
+
+**PERP_SEX** : Sex of the offender
+
+**PERP_RACE** : Racial group of the offender
+
+**VIC_AGE_GROUP** : Age range of the victim
+
+**VIC_SEX** : Sex of the victim
+
+**VIC_RACE** : Racial group of the victim
+
+**X_COORD_CD** : Cartesian X coordinate of the location at which the shooting incident occurred
+
+**Y_COORD_CD** : Cartesian Y coordinate of the location at which the shooting incident occurred
+
+**Latitude** : Geographical latitude coordinate of the location at which the shooting incident occurred
+
+**Longitude** : Geographical longitude coordinate of the location at which the shooting incident occurred
+
+**Lon_Lat** : Geographical point, composed of latitude and longitude coordinates, of the location at which the shooting incident occurred
