@@ -86,6 +86,7 @@ raw_data <- vroom("data/NYPD_Shooting_Incident_Data__Historic.csv")
 ## Basic information about the data file :
 
 ```{r}
+#| message: FALSE
 library(dplyr)
 ```
 
@@ -94,5 +95,6 @@ basic_info <- raw_data |>
   summarise("Name of the file" = "NYPD_Shooting_Incident_Data_Historic",
             "Number of observations" = nrow(raw_data),
             "Number of variables" = ncol(raw_data),)
+knitr::kable(basic_info)
 
 ```
