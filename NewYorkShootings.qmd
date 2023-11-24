@@ -70,10 +70,12 @@ For each observation, corresponding to a unique shooting incident, is provided i
 **Lon_Lat** : Geographical point, composed of latitude and longitude coordinates, of the location at which the shooting incident occurred
 
 ```{r}
+#| message: FALSE
 here::i_am("NewYorkShootings.Rproj")
 ```
 
 ```{r}
+#| message: FALSE
 library(vroom)
 ```
 
