@@ -24,3 +24,21 @@ This method, combining descriptive data with contextual information, we hope, wi
 The data, found in the official United States open data website, constitutes a list of every New York City shooting incident, reported by the NYPD, from January 1, 2006 to Decemeber 31, 2022. This data is manually extracted every quarter and reviewed by the Office of Management Analysis and Planning before being posted on the NYPD website.
 
 For each observation, corresponding to a unique shooting incident, is provided information relative to the date, time and localisation of the incident, as well as sociodemographic characteristics of the offender and victim.
+
+```{r}
+library(ggplot2)
+library(vroom)
+here::i_am("NewYorkShootings.Rproj")
+```
+
+```{r}
+ny <- vroom("data/NYPD_Shooting_Incident_Data__Historic.csv")
+```
+
+```{r}
+ny |> ggplot(aes(x=X_COORD_CD, y=Y_COORD_CD, color=BORO))+geom_point()
+```
+
+```{r}
+ny |> ggplot(aes(x=Longitude, y=Latitude, color=BORO))+geom_point()
+```
