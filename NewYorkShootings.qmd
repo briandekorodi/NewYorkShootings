@@ -69,13 +69,14 @@ For each observation, corresponding to a unique shooting incident, is provided i
 
 **Lon_Lat** : Geographical point, composed of latitude and longitude coordinates, of the location at which the shooting incident occurred
 
+## Load the data
+
 ```{r}
 #| message: FALSE
 here::i_am("NewYorkShootings.Rproj")
 ```
 
 ```{r}
-#| message: FALSE
 library(vroom)
 ```
 
@@ -86,7 +87,6 @@ raw_data <- vroom("data/NYPD_Shooting_Incident_Data__Historic.csv")
 ## Basic information about the data file :
 
 ```{r}
-#| message: FALSE
 library(dplyr)
 ```
 
@@ -102,135 +102,131 @@ knitr::kable(basic_info)
 ## Data Cleaning
 
 ```{r}
+clean_data <- raw_data
+```
+
+### (null) values
+
+```{r}
 raw_data |> distinct(LOCATION_DESC)
 ```
 
-The dataset contains some missing values for which it is NA and some for which it is "(null)". We replace all the "(null)" values by NA.
-
 ```{r}
-clean_data <- 
-raw_data[raw_data == "(null)"] <- NA
+raw_data |> distinct(PERP_AGE_GROUP)
 ```
 
-The variable OCCUR_TIME has a double type, which is not very readable. We change the format of this variable to the classic format of Hour:Minutes:Seconds.
+Several columns of the dataset contain some missing values for which it is NA and some for which it is "(null)". We replace all the "(null)" values in all columns by NA.
 
 ```{r}
-typeof(raw_data$OCCUR_TIME) 
+clean_data[clean_data == "(null)"] <- NA
+
+#clean_data |> distinct(PERP_AGE_GROUP)
+#clean_data |> distinct(LOCATION_DESC)
+```
+
+### Types
+
+```{r}
+raw_data[["OCCUR_TIME"]] |> typeof()
 ```
 
 The variable OCCUR_TIME has a double type, which is not very readable. We us as_hms to convert it from double to time.
 
 ```{r}
 library(hms)
-raw_data$OCCUR_TIME <- as_hms(raw_data$OCCUR_TIME)
+clean_data[["OCCUR_TIME"]] <- clean_data[["OCCUR_TIME"]] |> as_hms()
+```
+
+### Absurd and useless values
+
+```{r}
+clean_data |> distinct(VIC_AGE_GROUP)
 ```
 
 ```{r}
-raw_data |> select(OCCUR_TIME) |> all(as_hms())
+clean_data[["VIC_AGE_GROUP"]] |> typeof()
 ```
 
 ```{r}
-typeof(raw_data$VIC_AGE_GROUP)
+
+#raw_data$VIC_AGE_GROUP[raw_data$VIC_AGE_GROUP == 1022] <- NA
+
+clean_data <- clean_data |>
+  mutate(VIC_AGE_GROUP = ifelse(VIC_AGE_GROUP %in% c("1022", "UNKNOWN"), NA, VIC_AGE_GROUP))
+
+clean_data |> distinct(VIC_AGE_GROUP)
 ```
 
 ```{r}
-raw_data |> distinct(VIC_AGE_GROUP)
+clean_data |> distinct(PERP_AGE_GROUP)
 ```
 
 ```{r}
-raw_data[raw_data == "UNKNOWN"] <- NA
-```
+clean_data <- clean_data |>
+  mutate(PERP_AGE_GROUP = ifelse(PERP_AGE_GROUP %in% c("1020", "940", "224", "UNKNOWN"), NA, PERP_AGE_GROUP))
 
-```{r}
-raw_data |> distinct(VIC_AGE_GROUP)
-```
-
-```{r}
-raw_data$VIC_AGE_GROUP[raw_data$VIC_AGE_GROUP == 1022] <- NA
-```
-
-```{r}
-raw_data |> distinct(VIC_AGE_GROUP)
-```
-
-```{r}
-raw_data |> distinct(PERP_AGE_GROUP)
-```
-
-```{r}
-raw_data$PERP_AGE_GROUP[is.element(raw_data$PERP_AGE_GROUP, c(1020, 940,224))] <- NA
+clean_data |> distinct(PERP_AGE_GROUP)
 
 ```
 
 ```{r}
-raw_data |> distinct(PERP_AGE_GROUP)
+clean_data |> distinct(LOC_OF_OCCUR_DESC)
 ```
 
 ```{r}
-raw_data |> distinct(LOC_OF_OCCUR_DESC)
+clean_data |> distinct(LOC_CLASSFCTN_DESC)
 ```
 
 ```{r}
-raw_data |> distinct(LOC_CLASSFCTN_DESC)
+
+clean_data <- clean_data |>
+  mutate(LOC_CLASSFCTN_DESC = replace(LOC_CLASSFCTN_DESC, LOC_CLASSFCTN_DESC == "OTHER", NA))
+
+clean_data |> distinct(LOC_CLASSFCTN_DESC)
 ```
 
 ```{r}
-raw_data$LOC_CLASSFCTN_DESC[raw_data$LOC_CLASSFCTN_DESC == "OTHER"] <- NA
+clean_data |> distinct(LOCATION_DESC)
 ```
 
 ```{r}
-raw_data |> distinct(LOC_CLASSFCTN_DESC)
+clean_data <- clean_data |>
+  mutate(LOCATION_DESC = recode(LOCATION_DESC, "MULTI DWELL - PUBLIC HOUS" = "MULTI DWELL - PUBLIC HOUSE", "SOCIAL CLUB/POLICY LOCATI" = "SOCIAL CLUB/POLICY LOCATION"),
+         LOCATION_DESC = replace(LOCATION_DESC, LOCATION_DESC == "NONE", NA))
+
+clean_data |> distinct(LOCATION_DESC)                         
 ```
 
 ```{r}
-raw_data |> distinct(LOCATION_DESC)
+clean_data |> distinct(STATISTICAL_MURDER_FLAG)
 ```
 
 ```{r}
-raw_data$LOCATION_DESC[raw_data$LOCATION_DESC == "NONE"] <- NA
+clean_data |> distinct(PERP_SEX)
 ```
 
 ```{r}
-raw_data$LOCATION_DESC[raw_data$LOCATION_DESC == "MULTI DWELL - PUBLIC HOUS"] <- "MULTI DWELL - PUBLIC HOUSE"
-raw_data$LOCATION_DESC[raw_data$LOCATION_DESC == "SOCIAL CLUB/POLICY LOCATI"] <- "SOCIAL CLUB/POLICY LOCATION"
+clean_data <- clean_data |>
+  mutate(PERP_SEX = replace(PERP_SEX, PERP_SEX == "U", NA))
+
+clean_data |> distinct(PERP_SEX)
 ```
 
 ```{r}
-raw_data |> distinct(LOCATION_DESC)
+clean_data |> distinct(VIC_SEX)
 ```
 
 ```{r}
-raw_data |> distinct(STATISTICAL_MURDER_FLAG)
+clean_data <- clean_data |>
+  mutate(VIC_SEX = replace(VIC_SEX, VIC_SEX == "U", NA))
+
+clean_data |> distinct(VIC_SEX)
 ```
 
 ```{r}
-raw_data |> distinct(PERP_SEX)
+clean_data |> distinct(VIC_RACE)
 ```
 
 ```{r}
-raw_data$PERP_SEX[raw_data$PERP_SEX == "U"] <- NA
-```
-
-```{r}
-raw_data |> distinct(PERP_SEX)
-```
-
-```{r}
-raw_data |> distinct(VIC_SEX)
-```
-
-```{r}
-raw_data$VIC_SEX[raw_data$VIC_SEX == "U"] <- NA
-```
-
-```{r}
-raw_data |> distinct(VIC_SEX)
-```
-
-```{r}
-raw_data |> distinct(VIC_RACE)
-```
-
-```{r}
-raw_data |> distinct(PERP_RACE)
+clean_data |> distinct(PERP_RACE)
 ```
