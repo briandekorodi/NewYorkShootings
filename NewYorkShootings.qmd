@@ -19,13 +19,13 @@ This method, combining descriptive data with contextual information, we hope, wi
 
 ## Click [here](https://catalog.data.gov/dataset/nypd-shooting-incident-data-historic/resource/c564b578-fd8a-4005-8365-34150d306cc4) to access the source
 
-## Description of the source 
+## Description of the source
 
 The data, found in the official United States open data website, constitutes a list of every New York City shooting incident, reported by the NYPD, from January 1, 2006 to Decemeber 31, 2022. This data is manually extracted every quarter and reviewed by the Office of Management Analysis and Planning before being posted on the NYPD website.
 
 For each observation, corresponding to a unique shooting incident, is provided information relative to the date, time and localisation of the incident, as well as socio-demographic characteristics of the offender and victim.
 
-## Description of the variables 
+## Description of the variables
 
 **INCIDENT_KEY** : Serial number identifying the incident
 
@@ -84,7 +84,7 @@ library(vroom)
 raw_data <- vroom("data/NYPD_Shooting_Incident_Data__Historic.csv")
 ```
 
-## Basic information about the data file 
+## Basic information about the data file
 
 ```{r}
 #| message: FALSE
@@ -110,17 +110,19 @@ clean_data <- raw_data
 
 ### Wrong types
 
-The variable OCCUR_TIME has a double type, which is not very readable.
+Depending on the computer, he variable OCCUR_TIME may have a double type, which means its values take on a "... secs" format, rather than a "hours/minutes/seconds" format. This not very readable.
 
 ```{r}
-clean_data[["OCCUR_TIME"]] |> typeof()
+#In case this issue arises
+#clean_data[["OCCUR_TIME"]] |> typeof()
 ```
 
 We us as_hms to convert it from double to time.
 
 ```{r}
-library(hms)
-clean_data[["OCCUR_TIME"]] <- clean_data[["OCCUR_TIME"]] |> as_hms()
+#In case this issue arises
+#library(hms)
+#clean_data[["OCCUR_TIME"]] <- clean_data[["OCCUR_TIME"]] |> as_hms()
 ```
 
 ### Inconsistent labeling of missing values
@@ -150,8 +152,7 @@ clean_data[clean_data == "(null)"] <- NA
 The location description variable contains some missing values labeled as NONE. We replace these by NA.
 
 ```{r}
-clean_data <- clean_data |>
-  mutate(LOCATION_DESC = replace(LOCATION_DESC, LOCATION_DESC == "NONE", NA))
+clean_data[clean_data == "NONE"] <- NA
 ```
 
 #### UNKNOWN
@@ -167,13 +168,7 @@ clean_data |> distinct(PERP_AGE_GROUP)
 ```
 
 ```{r}
-clean_data <- clean_data |>
-  mutate(VIC_AGE_GROUP = ifelse(VIC_AGE_GROUP %in% c("UNKNOWN"), NA, VIC_AGE_GROUP))
-```
-
-```{r}
-clean_data <- clean_data |>
-  mutate(PERP_AGE_GROUP = ifelse(PERP_AGE_GROUP %in% c("UNKNOWN"), NA, PERP_AGE_GROUP))
+clean_data[clean_data == "UNKNOWN"] <- NA
 ```
 
 #### OTHER
@@ -185,8 +180,7 @@ clean_data |> distinct(LOC_CLASSFCTN_DESC)
 ```
 
 ```{r}
-clean_data <- clean_data |>
-  mutate(LOC_CLASSFCTN_DESC = replace(LOC_CLASSFCTN_DESC, LOC_CLASSFCTN_DESC == "OTHER", NA))
+clean_data[clean_data == "OTHER"] <- NA
 ```
 
 #### U
@@ -202,13 +196,7 @@ clean_data |> distinct(VIC_SEX)
 ```
 
 ```{r}
-clean_data <- clean_data |>
-  mutate(PERP_SEX = replace(PERP_SEX, PERP_SEX == "U", NA))
-```
-
-```{r}
-clean_data <- clean_data |>
-  mutate(VIC_SEX = replace(VIC_SEX, VIC_SEX == "U", NA))
+clean_data[clean_data == "U"] <- NA
 ```
 
 ### Impossible values
@@ -225,12 +213,8 @@ clean_data |> distinct(PERP_AGE_GROUP)
 
 ```{r}
 clean_data <- clean_data |>
-  mutate(VIC_AGE_GROUP = ifelse(VIC_AGE_GROUP %in% c("1022"), NA, VIC_AGE_GROUP))
-```
-
-```{r}
-clean_data <- clean_data |>
-  mutate(PERP_AGE_GROUP = ifelse(PERP_AGE_GROUP %in% c("1020", "940", "224"), NA, PERP_AGE_GROUP))
+  mutate(VIC_AGE_GROUP = ifelse(!VIC_AGE_GROUP %in% c("<18", "18-24", "25-44", "45-64", "65+"), NA, VIC_AGE_GROUP),
+         PERP_AGE_GROUP = ifelse(!PERP_AGE_GROUP %in% c("<18", "18-24", "25-44", "45-64", "65+"), NA, PERP_AGE_GROUP))
 ```
 
 ### Typos
