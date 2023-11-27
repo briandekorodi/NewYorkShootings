@@ -19,13 +19,13 @@ This method, combining descriptive data with contextual information, we hope, wi
 
 ## Click [here](https://catalog.data.gov/dataset/nypd-shooting-incident-data-historic/resource/c564b578-fd8a-4005-8365-34150d306cc4) to access the source
 
-## Description of the source :
+## Description of the source 
 
 The data, found in the official United States open data website, constitutes a list of every New York City shooting incident, reported by the NYPD, from January 1, 2006 to Decemeber 31, 2022. This data is manually extracted every quarter and reviewed by the Office of Management Analysis and Planning before being posted on the NYPD website.
 
 For each observation, corresponding to a unique shooting incident, is provided information relative to the date, time and localisation of the incident, as well as socio-demographic characteristics of the offender and victim.
 
-## Description of the variables :
+## Description of the variables 
 
 **INCIDENT_KEY** : Serial number identifying the incident
 
@@ -69,7 +69,7 @@ For each observation, corresponding to a unique shooting incident, is provided i
 
 **Lon_Lat** : Geographical point, composed of latitude and longitude coordinates, of the location at which the shooting incident occurred
 
-## Load the data
+## Loading the data
 
 ```{r}
 #| message: FALSE
@@ -84,9 +84,10 @@ library(vroom)
 raw_data <- vroom("data/NYPD_Shooting_Incident_Data__Historic.csv")
 ```
 
-## Basic information about the data file :
+## Basic information about the data file 
 
 ```{r}
+#| message: FALSE
 library(dplyr)
 ```
 
@@ -101,59 +102,63 @@ knitr::kable(basic_info)
 
 ## Data Cleaning
 
+We create a new dataset on which we will implement our cleaning steps.
+
 ```{r}
 clean_data <- raw_data
 ```
 
-### (null) values
+### Wrong types
+
+The variable OCCUR_TIME has a double type, which is not very readable.
 
 ```{r}
-raw_data |> distinct(LOCATION_DESC)
+clean_data[["OCCUR_TIME"]] |> typeof()
 ```
 
-```{r}
-raw_data |> distinct(PERP_AGE_GROUP)
-```
-
-Several columns of the dataset contain some missing values for which it is NA and some for which it is "(null)". We replace all the "(null)" values in all columns by NA.
-
-```{r}
-clean_data[clean_data == "(null)"] <- NA
-
-#clean_data |> distinct(PERP_AGE_GROUP)
-#clean_data |> distinct(LOCATION_DESC)
-```
-
-### Types
-
-```{r}
-raw_data[["OCCUR_TIME"]] |> typeof()
-```
-
-The variable OCCUR_TIME has a double type, which is not very readable. We us as_hms to convert it from double to time.
+We us as_hms to convert it from double to time.
 
 ```{r}
 library(hms)
 clean_data[["OCCUR_TIME"]] <- clean_data[["OCCUR_TIME"]] |> as_hms()
 ```
 
-### Absurd and useless values
+### Inconsistent labeling of missing values
+
+The dataset contains some inconsistencies in the entry of missing values. Some missing values are labeled NA, while others are labeled with some other character value, such as "(null)", "UNKNOWN", "U", or "OTHER". We convert all of these to NA.
+
+#### Null
+
+The location description and offender age group variables contain missing values that have the notation "(null)".
 
 ```{r}
-clean_data |> distinct(VIC_AGE_GROUP)
+clean_data |> distinct(LOCATION_DESC)
 ```
 
 ```{r}
-clean_data[["VIC_AGE_GROUP"]] |> typeof()
+clean_data |> distinct(PERP_AGE_GROUP)
 ```
 
+We replace all the "(null)" values in the dataset by NA.
+
 ```{r}
+clean_data[clean_data == "(null)"] <- NA
+```
 
-#raw_data$VIC_AGE_GROUP[raw_data$VIC_AGE_GROUP == 1022] <- NA
+#### NONE
 
+The location description variable contains some missing values labeled as NONE. We replace these by NA.
+
+```{r}
 clean_data <- clean_data |>
-  mutate(VIC_AGE_GROUP = ifelse(VIC_AGE_GROUP %in% c("1022", "UNKNOWN"), NA, VIC_AGE_GROUP))
+  mutate(LOCATION_DESC = replace(LOCATION_DESC, LOCATION_DESC == "NONE", NA))
+```
 
+#### UNKNOWN
+
+The victim age group variable contains some missing values labeled as UNKNOWN. We replace these by NA.
+
+```{r}
 clean_data |> distinct(VIC_AGE_GROUP)
 ```
 
@@ -163,27 +168,74 @@ clean_data |> distinct(PERP_AGE_GROUP)
 
 ```{r}
 clean_data <- clean_data |>
-  mutate(PERP_AGE_GROUP = ifelse(PERP_AGE_GROUP %in% c("1020", "940", "224", "UNKNOWN"), NA, PERP_AGE_GROUP))
-
-clean_data |> distinct(PERP_AGE_GROUP)
-
+  mutate(VIC_AGE_GROUP = ifelse(VIC_AGE_GROUP %in% c("UNKNOWN"), NA, VIC_AGE_GROUP))
 ```
 
 ```{r}
-clean_data |> distinct(LOC_OF_OCCUR_DESC)
+clean_data <- clean_data |>
+  mutate(PERP_AGE_GROUP = ifelse(PERP_AGE_GROUP %in% c("UNKNOWN"), NA, PERP_AGE_GROUP))
 ```
+
+#### OTHER
+
+The location classification variable contains some missing values labeled as OTHER. We replace these by NA.
 
 ```{r}
 clean_data |> distinct(LOC_CLASSFCTN_DESC)
 ```
 
 ```{r}
-
 clean_data <- clean_data |>
   mutate(LOC_CLASSFCTN_DESC = replace(LOC_CLASSFCTN_DESC, LOC_CLASSFCTN_DESC == "OTHER", NA))
-
-clean_data |> distinct(LOC_CLASSFCTN_DESC)
 ```
+
+#### U
+
+The victim and offender sex variables contain some missing values labeled as U. We replace these by NA.
+
+```{r}
+clean_data |> distinct(PERP_SEX)
+```
+
+```{r}
+clean_data |> distinct(VIC_SEX)
+```
+
+```{r}
+clean_data <- clean_data |>
+  mutate(PERP_SEX = replace(PERP_SEX, PERP_SEX == "U", NA))
+```
+
+```{r}
+clean_data <- clean_data |>
+  mutate(VIC_SEX = replace(VIC_SEX, VIC_SEX == "U", NA))
+```
+
+### Impossible values
+
+The victim and offender age group variables contain some absurd values. It is impossible that the victim's age be 1022, or that the offender's age be 1020, 940 or 224. We replace these values by NA.
+
+```{r}
+clean_data |> distinct(VIC_AGE_GROUP)
+```
+
+```{r}
+clean_data |> distinct(PERP_AGE_GROUP)
+```
+
+```{r}
+clean_data <- clean_data |>
+  mutate(VIC_AGE_GROUP = ifelse(VIC_AGE_GROUP %in% c("1022"), NA, VIC_AGE_GROUP))
+```
+
+```{r}
+clean_data <- clean_data |>
+  mutate(PERP_AGE_GROUP = ifelse(PERP_AGE_GROUP %in% c("1020", "940", "224"), NA, PERP_AGE_GROUP))
+```
+
+### Typos
+
+The location description variable contains some values with typos. We correct these.
 
 ```{r}
 clean_data |> distinct(LOCATION_DESC)
@@ -191,42 +243,6 @@ clean_data |> distinct(LOCATION_DESC)
 
 ```{r}
 clean_data <- clean_data |>
-  mutate(LOCATION_DESC = recode(LOCATION_DESC, "MULTI DWELL - PUBLIC HOUS" = "MULTI DWELL - PUBLIC HOUSE", "SOCIAL CLUB/POLICY LOCATI" = "SOCIAL CLUB/POLICY LOCATION"),
-         LOCATION_DESC = replace(LOCATION_DESC, LOCATION_DESC == "NONE", NA))
-
-clean_data |> distinct(LOCATION_DESC)                         
-```
-
-```{r}
-clean_data |> distinct(STATISTICAL_MURDER_FLAG)
-```
-
-```{r}
-clean_data |> distinct(PERP_SEX)
-```
-
-```{r}
-clean_data <- clean_data |>
-  mutate(PERP_SEX = replace(PERP_SEX, PERP_SEX == "U", NA))
-
-clean_data |> distinct(PERP_SEX)
-```
-
-```{r}
-clean_data |> distinct(VIC_SEX)
-```
-
-```{r}
-clean_data <- clean_data |>
-  mutate(VIC_SEX = replace(VIC_SEX, VIC_SEX == "U", NA))
-
-clean_data |> distinct(VIC_SEX)
-```
-
-```{r}
-clean_data |> distinct(VIC_RACE)
-```
-
-```{r}
-clean_data |> distinct(PERP_RACE)
+  mutate(LOCATION_DESC = recode(LOCATION_DESC, "MULTI DWELL - PUBLIC HOUS" =  "MULTI DWELL - PUBLIC HOUSE", 
+                                "SOCIAL CLUB/POLICY LOCATI" = "SOCIAL CLUB/POLICY LOCATION"))
 ```
