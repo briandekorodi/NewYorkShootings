@@ -92,10 +92,18 @@ library(dplyr)
 ```
 
 ```{r}
-basic_info <- raw_data |>
+basic_info <- clean_data |>
   summarise("Name of the file" = "NYPD_Shooting_Incident_Data_Historic",
-            "Number of observations" = nrow(raw_data),
-            "Number of variables" = ncol(raw_data),)
+            "File content" = "Reported shooting incidents in New York City",
+            "Number of observations" = nrow(clean_data),
+            "Number of variables" = ncol(clean_data),
+            "Date of first observation" = last(OCCUR_DATE),
+            "Date of last observation" = first(OCCUR_DATE),
+            "Number of numerical variables" = length(select_if(clean_data,is.numeric)),
+            "Number of character variables" = length(select_if(clean_data,is.character)),
+            "Number of logical variables" = length(select_if(clean_data,is.logical)),
+            "Number of time variables" = length(select_if(clean_data,is_hms)),
+            "Proportion of missing values" = (sum(is.na(clean_data)))/((nrow(clean_data))/(ncol(clean_data))))
 knitr::kable(basic_info)
 
 ```
