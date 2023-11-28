@@ -81,6 +81,7 @@ library(vroom)
 ```
 
 ```{r}
+
 raw_data <- vroom("data/NYPD_Shooting_Incident_Data__Historic.csv")
 ```
 
@@ -96,7 +97,7 @@ We create a new dataset on which we will implement our cleaning steps.
 clean_data <- raw_data
 ```
 
-### Wrong types
+s### Wrong types
 
 Depending on the computer, he variable OCCUR_TIME may have a double type, which means its values take on a "... secs" format, rather than a "hours/minutes/seconds" format. This not very readable.
 
@@ -237,3 +238,22 @@ basic_info <- clean_data |>
 knitr::kable(basic_info)
 
 ```
+
+## A first look 
+
+```{r}
+library(ggplot2)
+```
+
+```{r}
+clean_data |>
+  ggplot(aes(x=Longitude, y=Latitude, color=BORO))+
+  geom_point() +
+  labs(title = "Locations of shooting incidents in New York City, 2006-2022")
+```
+
+![Map of New York City](NYC_Map.png){fig-align="center" width="310"}
+
+Nothing illustrates the tight link between New York City and its history of gun violence quite like the near reproduction of the city map simply by plotting all shooting incidents according to their geographical coordinates.
+
+On this note, we will attempt to further deconstruct the patterns behind this remarkable data.
