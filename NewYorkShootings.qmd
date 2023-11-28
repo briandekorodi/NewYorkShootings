@@ -84,31 +84,11 @@ library(vroom)
 raw_data <- vroom("data/NYPD_Shooting_Incident_Data__Historic.csv")
 ```
 
-## Basic information about the data file
+## Data Cleaning
 
 ```{r}
-#| message: FALSE
 library(dplyr)
 ```
-
-```{r}
-basic_info <- clean_data |>
-  summarise("Name of the file" = "NYPD_Shooting_Incident_Data_Historic",
-            "File content" = "Reported shooting incidents in New York City",
-            "Number of observations" = nrow(clean_data),
-            "Number of variables" = ncol(clean_data),
-            "Date of first observation" = last(OCCUR_DATE),
-            "Date of last observation" = first(OCCUR_DATE),
-            "Number of numerical variables" = length(select_if(clean_data,is.numeric)),
-            "Number of character variables" = length(select_if(clean_data,is.character)),
-            "Number of logical variables" = length(select_if(clean_data,is.logical)),
-            "Number of time variables" = length(select_if(clean_data,is_hms)),
-            "Proportion of missing values" = (sum(is.na(clean_data)))/((nrow(clean_data))/(ncol(clean_data))))
-knitr::kable(basic_info)
-
-```
-
-## Data Cleaning
 
 We create a new dataset on which we will implement our cleaning steps.
 
@@ -129,7 +109,7 @@ We us as_hms to convert it from double to time.
 
 ```{r}
 #In case this issue arises
-#library(hms)
+library(hms)
 #clean_data[["OCCUR_TIME"]] <- clean_data[["OCCUR_TIME"]] |> as_hms()
 ```
 
@@ -237,4 +217,23 @@ clean_data |> distinct(LOCATION_DESC)
 clean_data <- clean_data |>
   mutate(LOCATION_DESC = recode(LOCATION_DESC, "MULTI DWELL - PUBLIC HOUS" =  "MULTI DWELL - PUBLIC HOUSE", 
                                 "SOCIAL CLUB/POLICY LOCATI" = "SOCIAL CLUB/POLICY LOCATION"))
+```
+
+## Basic information about the data file
+
+```{r}
+basic_info <- clean_data |>
+  summarise("Name of the file" = gsub(".csv","", list.files("data")),
+            "File content" = "Reported shooting incidents in New York City",
+            "Number of observations" = nrow(clean_data),
+            "Number of variables" = ncol(clean_data),
+            "Date of first observation" = last(OCCUR_DATE),
+            "Date of last observation" = first(OCCUR_DATE),
+            "Number of numerical variables" = length(select_if(clean_data,is.numeric)),
+            "Number of character variables" = length(select_if(clean_data,is.character)),
+            "Number of logical variables" = length(select_if(clean_data,is.logical)),
+            "Number of time variables" = length(select_if(clean_data,is_hms)),
+            "Proportion of missing values" = (sum(is.na(clean_data)))/((nrow(clean_data))*(ncol(clean_data))))
+knitr::kable(basic_info)
+
 ```
