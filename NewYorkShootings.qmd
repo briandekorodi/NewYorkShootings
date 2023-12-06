@@ -5,7 +5,7 @@ format: pdf
 editor: visual
 ---
 
-# Gun violence sin the Big Apple: How shooting incidents help to tell the story of New York City over the last 15 years.
+# Gun violence in the Big Apple: How shooting incidents help to tell the story of New York City over the last 15 years.
 
 A city of bright lights and big dreams, New York's history is also one of crime, violence and social inequality. This is why we will attempt to tell the story of New York City through the lens of its shooting incidents.
 
