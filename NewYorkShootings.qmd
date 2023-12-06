@@ -258,3 +258,15 @@ clean_data |>
 Nothing illustrates the tight link between New York City and its history of gun violence quite like the near reproduction of the city map simply by plotting all shooting incidents according to their geographical coordinates.
 
 On this note, we will attempt to further deconstruct the patterns behind this remarkable data.
+
+### Shootings over time in New York City
+
+```{r}
+clean_data |>
+  mutate("year"=gsub(".*/", "", OCCUR_DATE)) |>
+  select(`year`) |>
+  group_by(`year`) |>
+  summarise("Shooting incidents" = n()) |>
+  ggplot(aes(x = `year`, y = `Shooting incidents`)) +
+  geom_col()
+```
