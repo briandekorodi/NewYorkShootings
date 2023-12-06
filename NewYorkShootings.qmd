@@ -1,7 +1,7 @@
 ---
 title: "NewYorkShootings"
 author: "Brian de Korodi & Mariane Modena"
-format: html
+format: pdf
 editor: visual
 ---
 
@@ -239,7 +239,7 @@ knitr::kable(basic_info)
 
 ```
 
-## A first look 
+## A first look
 
 ```{r}
 library(ggplot2)
