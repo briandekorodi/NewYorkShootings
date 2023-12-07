@@ -270,3 +270,15 @@ clean_data |>
   ggplot(aes(x = `year`, y = `Shooting incidents`)) +
   geom_col()
 ```
+
+### It's cold outside: Average shootings by month of the year
+
+```{r}
+clean_data |>
+  mutate("month"=substr(OCCUR_DATE, 1, 2)) |>
+  select(`month`) |>
+  group_by(`month`) |>
+  summarise("Shooting incidents" = (n()/16)) |>
+  ggplot(aes(x = `month`, y = `Shooting incidents`)) +
+  geom_col()
+```
