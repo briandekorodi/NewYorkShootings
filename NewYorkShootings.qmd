@@ -97,7 +97,7 @@ We create a new dataset on which we will implement our cleaning steps.
 clean_data <- raw_data
 ```
 
-s### Wrong types
+\### Wrong types
 
 Depending on the computer, he variable OCCUR_TIME may have a double type, which means its values take on a "... secs" format, rather than a "hours/minutes/seconds" format. This not very readable.
 
@@ -111,7 +111,13 @@ We us as_hms to convert it from double to time.
 ```{r}
 #In case this issue arises
 library(hms)
-#clean_data[["OCCUR_TIME"]] <- clean_data[["OCCUR_TIME"]] |> as_hms()
+clean_data[["OCCUR_TIME"]] <- clean_data[["OCCUR_TIME"]] |> as_hms()
+```
+
+we change the type of OCCUR_DATE from character to date.
+
+```{r}
+clean_data[["OCCUR_DATE"]] <- clean_data[["OCCUR_DATE"]] |> as.Date(format="%m/%d/%y")
 ```
 
 ### Inconsistent labeling of missing values
