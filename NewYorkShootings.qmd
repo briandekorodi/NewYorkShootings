@@ -277,6 +277,19 @@ clean_data |>
 clean_data |>
   mutate("month"=substr(OCCUR_DATE, 1, 2)) |>
   select(`month`) |>
+  recode(month,
+         01 = "Jan",
+         02 = "Feb",
+         03 = "Mar",
+         04 = "Apr",
+         05 = "May",
+         06 = "Jun",
+         07 = "Jul",
+         08 = "Aug",
+         09 = "Sep",
+         10 = "Oct",
+         11 = "Nov",
+         12 = "Dec") |>
   group_by(`month`) |>
   summarise("Shooting incidents" = (n()/16)) |>
   ggplot(aes(x = `month`, y = `Shooting incidents`)) +
