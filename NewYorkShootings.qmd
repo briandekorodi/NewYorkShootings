@@ -314,6 +314,11 @@ Grouping by year and by Boroughs :
 ### It's cold outside: Average shootings by month of the year
 
 ```{r}
+months_association <- data.frame("month name"=c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"), "month"=c(1,2,3,4,5,6,7,8,9,10,11,12)
+)
+```
+
+```{r}
 library(tidyverse) 
 
 clean_data |>
