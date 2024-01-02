@@ -267,27 +267,7 @@ On this note, we will attempt to further deconstruct the patterns behind this re
 
 ### Shootings over time in New York City
 
-```{r}
-clean_data |>
-  mutate("year"=gsub(".*/", "", OCCUR_DATE)) |>
-  select(`year`) |>
-  group_by(`year`) |>
-  summarise("Shooting incidents" = n()) |>
-  ggplot(aes(x = `year`, y = `Shooting incidents`)) +
-  geom_col()
-```
-
-### It's cold outside: Average shootings by month of the year
-
-```{r}
-clean_data |>
-  mutate("month"=substr(OCCUR_DATE, 1, 2)) |>
-  select(`month`) |>
-  group_by(`month`) |>
-  summarise("Shooting incidents" = (n()/16)) |>
-  ggplot(aes(x = `month`, y = `Shooting incidents`)) +
-  geom_col()
-```
+Without any grouping :
 
 ```{r}
 clean_data |>
@@ -297,20 +277,52 @@ clean_data |>
   geom_line() 
 ```
 
+clearly there are too many dates...
+
+Grouping by year :
+
 ```{r}
 library(lubridate)
 
-clean_data |>
-  mutate('year'=year(OCCUR_DATE)) |>
-  group_by(OCCUR_DATE) |>
-  summarise("Shooting incidents" = n()) |>
-  ggplot(aes(x = `OCCUR_DATE`, y = `Shooting incidents`)) +
-  facet_wrap(~year, scales = "free")
-  
+  clean_data |>
+  select(OCCUR_DATE) |>
+  mutate('year'=year(OCCUR_DATE))|>
+  group_by(year)|>
+  summarise('Number of shootings'= n()) |>
+  ggplot(aes(x=year, y=`Number of shootings`)) +
+    geom_line() + 
+    geom_point() +
+    scale_x_continuous(breaks=c(seq(2006,2022,by=1))) +
+    labs(title="Number of shooting incidents in NYC over the years ")
 ```
 
+Grouping by year and by Boroughs :
+
 ```{r}
+ clean_data |>
+  select(OCCUR_DATE, BORO) |>
+  mutate('year'=year(OCCUR_DATE))|>
+  group_by(year, BORO)|>
+  summarise('Number of shootings'= n()) |>
+  ggplot(aes(x=year, y=`Number of shootings`, group=BORO, color=BORO)) +
+    geom_line() + 
+    geom_point() +
+    scale_x_continuous(breaks=c(seq(2006,2022,by=2))) +
+    labs(title="Number of shooting incidents by boroughs over the years ")
+```
+
+### It's cold outside: Average shootings by month of the year
+
+```{r}
+library(tidyverse) 
+
 clean_data |>
-  mutate('year'=year(OCCUR_DATE)) |>
-  select(year)
+  select(OCCUR_DATE) |>
+  mutate('month'=month(OCCUR_DATE))|>
+  group_by(month)|>
+  summarise('Average number of shooting incidents'= n()/16) |>
+  left_join(months_association) |>
+  ggplot(aes(x=fct_inorder(month.name), y=`Average number of shooting incidents`)) +
+  geom_col() +
+  labs(x="Month", title="Average number of shooting incidents per month in NYC", subtitle="over the period 2006-2022")
 ```
