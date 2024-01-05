@@ -1,0 +1,2 @@
+"0","life_birth <- life_birth |> "
+"0","  select(!where(single_valued))"

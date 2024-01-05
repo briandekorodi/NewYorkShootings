@@ -1,0 +1,8 @@
+"0","(life_birth |> "
+"0","   pull(ValueType) |> "
+"0","   unique() |> "
+"0","   length()) == 1"
+"1","[1]"
+"1"," TRUE"
+"1","
+"

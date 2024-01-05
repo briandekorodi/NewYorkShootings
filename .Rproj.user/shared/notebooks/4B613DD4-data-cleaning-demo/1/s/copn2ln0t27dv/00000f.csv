@@ -1,0 +1,4 @@
+"0","life_birth <- life |> filter(IndicatorCode == ""WHOSIS_000001"") |> life_reformating()"
+"0","life_60 <- life |> "
+"0","  filter(IndicatorCode == ""WHOSIS_000015"") |> "
+"0","  life_reformating()"

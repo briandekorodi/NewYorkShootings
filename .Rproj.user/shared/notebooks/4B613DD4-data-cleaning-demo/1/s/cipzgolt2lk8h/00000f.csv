@@ -1,0 +1,4 @@
+"0","parent_codes <- life_birth |> "
+"0","  distinct(ParentLocationCode, ParentLocation)"
+"0","country_codes <- life_birth |> "
+"0","  distinct(SpatialDimValueCode, Location)"

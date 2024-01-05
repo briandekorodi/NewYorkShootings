@@ -1,0 +1,3 @@
+"0","clean_data <- clean_data |>"
+"0","  mutate(VIC_AGE_GROUP = ifelse(!VIC_AGE_GROUP %in% c(""<18"", ""18-24"", ""25-44"", ""45-64"", ""65+""), NA, VIC_AGE_GROUP),"
+"0","         PERP_AGE_GROUP = ifelse(!PERP_AGE_GROUP %in% c(""<18"", ""18-24"", ""25-44"", ""45-64"", ""65+""), NA, PERP_AGE_GROUP))"

@@ -1,0 +1,4 @@
+"0","clean_data |>"
+"0","  ggplot(aes(x=Longitude, y=Latitude, color=BORO))+"
+"0","  geom_point() +"
+"0","  labs(title = ""Locations of shooting incidents in New York City, 2006-2022"")"

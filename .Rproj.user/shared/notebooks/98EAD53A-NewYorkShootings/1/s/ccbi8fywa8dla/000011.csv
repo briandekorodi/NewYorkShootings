@@ -1,0 +1,7 @@
+"0","clean_data |>"
+"0","  mutate(""year""=gsub("".*/"", """", OCCUR_DATE)) |>"
+"0","  select(`year`) |>"
+"0","  group_by(`year`) |>"
+"0","  summarise(""Shooting incidents"" = n()) |>"
+"0","  ggplot(aes(x = `year`, y = `Shooting incidents`)) +"
+"0","  geom_col()"

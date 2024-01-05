@@ -1,0 +1,333 @@
+---
+title: "NewYorkShootings"
+author: "Brian de Korodi & Mariane Modena"
+format: pdf
+editor: visual
+---
+
+# Gun violence in the Big Apple: How shooting incidents help to tell the story of New York City over the last 15 years.
+
+A city of bright lights and big dreams, New York's history is also one of crime, violence and social inequality. This is why we will attempt to tell the story of New York City through the lens of its shooting incidents.
+
+Through geographical, sociodemographic and temporal aspects of reported shooting incidents in New York City, we attempt to find relevant trends that might align with social and economic developments between 2006 and 2022.
+
+We have found certified data with detailed descriptive characteristics of all reported shooting incidents, including date, time, location, victim and offender's characteristics. This will allow us to summarize the quantity of shooting incidents as a function of these characteristics, along with their evolution over the given timeframe. Where significant patterns reveal themselves, we will attempt to use external information to help explain these patterns in light of various contextual factors, such as political, social, or economic evolutions. 
+
+This method, combining descriptive data with contextual information, we hope, will allow us to determine to what extent gun violence incidents are random events, or whether they may be partially explained by larger social and economic forces.
+
+## Click [here](https://github.com/briandekorodi/NewYorkShootings) to access the Github repository
+
+## Click [here](https://catalog.data.gov/dataset/nypd-shooting-incident-data-historic/resource/c564b578-fd8a-4005-8365-34150d306cc4) to access the source
+
+## Description of the source
+
+The data, found in the official United States open data website, constitutes a list of every New York City shooting incident, reported by the NYPD, from January 1, 2006 to Decemeber 31, 2022. This data is manually extracted every quarter and reviewed by the Office of Management Analysis and Planning before being posted on the NYPD website.
+
+For each observation, corresponding to a unique shooting incident, is provided information relative to the date, time and localisation of the incident, as well as socio-demographic characteristics of the offender and victim.
+
+## Description of the variables
+
+**INCIDENT_KEY** : Serial number identifying the incident
+
+**OCCUR_DATE** : Date (Month/Day/Year) on which the incident occurred
+
+**OCCUR_TIME** : Time at which the incident occured
+
+**BORO** : Which of the 5 New York City boroughs the incident occurred in (Manhattan, Queens, Brooklyn, Bronx, Staten Island)
+
+**LOC_OF_OCCUR_DESC** : Most general category of location, whether the incident occurred inside ,outside, or unknown
+
+**PRECINCT** : Code identifying which NYPD precinct in which the incident occurred
+
+**JURISDICTION_CODE** : Code identifying the tax jurisdiction territory in which the incident occurred
+
+**LOC_CLASSFCTN_DESC** : Second most general category of location
+
+**LOCATION_DESC** : Third most general category of location
+
+**STATISTICAL_MURDER_FLAG** : TRUE/FALSE variable indicating whether the shooting resulted in a murder
+
+**PERP_AGE_GROUP** : Age range of the offender
+
+**PERP_SEX** : Sex of the offender
+
+**PERP_RACE** : Racial group of the offender
+
+**VIC_AGE_GROUP** : Age range of the victim
+
+**VIC_SEX** : Sex of the victim
+
+**VIC_RACE** : Racial group of the victim
+
+**X_COORD_CD** : Cartesian X coordinate of the location at which the shooting incident occurred
+
+**Y_COORD_CD** : Cartesian Y coordinate of the location at which the shooting incident occurred
+
+**Latitude** : Geographical latitude coordinate of the location at which the shooting incident occurred
+
+**Longitude** : Geographical longitude coordinate of the location at which the shooting incident occurred
+
+**Lon_Lat** : Geographical point, composed of latitude and longitude coordinates, of the location at which the shooting incident occurred
+
+## Loading the data
+
+```{r}
+#| message: FALSE
+here::i_am("NewYorkShootings.Rproj")
+```
+
+```{r}
+library(vroom)
+```
+
+```{r}
+
+raw_data <- vroom("data/NYPD_Shooting_Incident_Data__Historic.csv")
+```
+
+## Data Cleaning
+
+```{r}
+library(dplyr)
+```
+
+We create a new dataset on which we will implement our cleaning steps.
+
+```{r}
+clean_data <- raw_data
+```
+
+### Inconsistent labeling of missing values
+
+The dataset contains some inconsistencies in the entry of missing values. Some missing values are labeled NA, while others are labeled with some other character value, such as "(null)", "UNKNOWN", "U", or "OTHER". We convert all of these to NA.
+
+#### Null
+
+The location description and offender age group variables contain missing values that have the notation "(null)".
+
+```{r}
+clean_data |> distinct(LOCATION_DESC)
+```
+
+```{r}
+clean_data |> distinct(PERP_AGE_GROUP)
+```
+
+We replace all the "(null)" values in the dataset by NA.
+
+```{r}
+clean_data[clean_data == "(null)"] <- NA
+```
+
+#### NONE
+
+The location description variable contains some missing values labeled as NONE. We replace these by NA.
+
+```{r}
+clean_data[clean_data == "NONE"] <- NA
+```
+
+#### UNKNOWN
+
+The victim age group variable contains some missing values labeled as UNKNOWN. We replace these by NA.
+
+```{r}
+clean_data |> distinct(VIC_AGE_GROUP)
+```
+
+```{r}
+clean_data |> distinct(PERP_AGE_GROUP)
+```
+
+```{r}
+clean_data[clean_data == "UNKNOWN"] <- NA
+```
+
+#### OTHER
+
+The location classification variable contains some missing values labeled as OTHER. We replace these by NA.
+
+```{r}
+clean_data |> distinct(LOC_CLASSFCTN_DESC)
+```
+
+```{r}
+clean_data[clean_data == "OTHER"] <- NA
+```
+
+#### U
+
+The victim and offender sex variables contain some missing values labeled as U. We replace these by NA.
+
+```{r}
+clean_data |> distinct(PERP_SEX)
+```
+
+```{r}
+clean_data |> distinct(VIC_SEX)
+```
+
+```{r}
+clean_data[clean_data == "U"] <- NA
+```
+
+### Impossible values
+
+The victim and offender age group variables contain some absurd values. It is impossible that the victim's age be 1022, or that the offender's age be 1020, 940 or 224. We replace these values by NA.
+
+```{r}
+clean_data |> distinct(VIC_AGE_GROUP)
+```
+
+```{r}
+clean_data |> distinct(PERP_AGE_GROUP)
+```
+
+```{r}
+clean_data <- clean_data |>
+  mutate(VIC_AGE_GROUP = ifelse(!VIC_AGE_GROUP %in% c("<18", "18-24", "25-44", "45-64", "65+"), NA, VIC_AGE_GROUP),
+         PERP_AGE_GROUP = ifelse(!PERP_AGE_GROUP %in% c("<18", "18-24", "25-44", "45-64", "65+"), NA, PERP_AGE_GROUP))
+```
+
+### Typos
+
+The location description variable contains some values with typos. We correct these.
+
+```{r}
+clean_data |> distinct(LOCATION_DESC)
+```
+
+```{r}
+clean_data <- clean_data |>
+  mutate(LOCATION_DESC = recode(LOCATION_DESC, "MULTI DWELL - PUBLIC HOUS" =  "MULTI DWELL - PUBLIC HOUSE", 
+                                "SOCIAL CLUB/POLICY LOCATI" = "SOCIAL CLUB/POLICY LOCATION"))
+```
+
+### Wrong types
+
+Depending on the computer, he variable OCCUR_TIME may have a double type, which means its values take on a "... secs" format, rather than a "hours/minutes/seconds" format. This not very readable.
+
+```{r}
+#In case this issue arises
+#clean_data[["OCCUR_TIME"]] |> typeof()
+```
+
+We us as_hms to convert it from double to time.
+
+```{r}
+#In case this issue arises
+library(hms)
+clean_data[["OCCUR_TIME"]] <- clean_data[["OCCUR_TIME"]] |> as_hms()
+```
+
+we change the type of OCCUR_DATE from character to date.
+
+```{r}
+clean_data[["OCCUR_DATE"]] <- clean_data[["OCCUR_DATE"]] |> as.Date(format="%m/%d/%Y")
+```
+
+## Basic information about the data file
+
+```{r}
+basic_info <- clean_data |>
+  summarise("Name of the file" = gsub(".csv","", list.files("data")),
+            "File content" = "Reported shooting incidents in New York City",
+            "Number of observations" = nrow(clean_data),
+            "Number of variables" = ncol(clean_data),
+            "Date of first observation" = last(OCCUR_DATE),
+            "Date of last observation" = first(OCCUR_DATE),
+            "Number of numerical variables" = length(select_if(clean_data,is.numeric)),
+            "Number of character variables" = length(select_if(clean_data,is.character)),
+            "Number of logical variables" = length(select_if(clean_data,is.logical)),
+            "Number of time variables" = length(select_if(clean_data,is_hms)),
+            "Proportion of missing values" = (sum(is.na(clean_data)))/((nrow(clean_data))*(ncol(clean_data))))
+knitr::kable(basic_info)
+
+```
+
+## A first look
+
+```{r}
+library(ggplot2)
+```
+
+```{r}
+clean_data |>
+  filter(!is.na(Longitude) & !is.na(Latitude)) |>
+  ggplot(aes(x=Longitude, y=Latitude, color=BORO))+
+  geom_point() +
+  labs(title = "Locations of shooting incidents in New York City, 2006-2022")
+```
+
+![Map of New York City](NYC_Map.png){fig-align="center" width="310"}
+
+Nothing illustrates the tight link between New York City and its history of gun violence quite like the near reproduction of the city map simply by plotting all shooting incidents according to their geographical coordinates.
+
+On this note, we will attempt to further deconstruct the patterns behind this remarkable data.
+
+### Shootings over time in New York City
+
+Without any grouping :
+
+```{r}
+clean_data |>
+  group_by(OCCUR_DATE) |>
+  summarise("Shooting incidents" = n()) |>
+  ggplot(aes(x = `OCCUR_DATE`, y = `Shooting incidents`)) +
+  geom_line() 
+```
+
+clearly there are too many dates...
+
+Grouping by year :
+
+```{r}
+library(lubridate)
+
+  clean_data |>
+  select(OCCUR_DATE) |>
+  mutate('year'=year(OCCUR_DATE))|>
+  group_by(year)|>
+  summarise('Number of shootings'= n()) |>
+  ggplot(aes(x=year, y=`Number of shootings`)) +
+    geom_line() + 
+    geom_point() +
+    scale_x_continuous(breaks=c(seq(2006,2022,by=1))) +
+    labs(title="Number of shooting incidents in NYC over the years ")
+```
+
+Grouping by year and by Boroughs :
+
+```{r}
+ clean_data |>
+  select(OCCUR_DATE, BORO) |>
+  mutate('year'=year(OCCUR_DATE))|>
+  group_by(year, BORO)|>
+  summarise('Number of shootings'= n()) |>
+  ggplot(aes(x=year, y=`Number of shootings`, group=BORO, color=BORO)) +
+    geom_line() + 
+    geom_point() +
+    scale_x_continuous(breaks=c(seq(2006,2022,by=2))) +
+    labs(title="Number of shooting incidents by boroughs over the years ")
+```
+
+### It's cold outside: Average shootings by month of the year
+
+```{r}
+months_association <- data.frame("month name"=c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"), "month"=c(1,2,3,4,5,6,7,8,9,10,11,12)
+)
+```
+
+```{r}
+library(tidyverse) 
+
+clean_data |>
+  select(OCCUR_DATE) |>
+  mutate('month'=month(OCCUR_DATE))|>
+  group_by(month)|>
+  summarise('Average number of shooting incidents'= n()/16) |>
+  left_join(months_association) |>
+  ggplot(aes(x=fct_inorder(month.name), y=`Average number of shooting incidents`)) +
+  geom_col() +
+  labs(x="Month", title="Average number of shooting incidents per month in NYC", subtitle="over the period 2006-2022")
+```

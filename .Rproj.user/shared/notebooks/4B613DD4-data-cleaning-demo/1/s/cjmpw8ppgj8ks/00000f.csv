@@ -1,0 +1,6 @@
+"0","life_birth[[""life_expectancy""]] |> "
+"0","  pivot_wider(values_from = Value, names_from = Attribute) |>"
+"0","  left_join(life_birth[[""region_codes""]], join_by(Region)) |>"
+"0","  ggplot(aes(x=Year, y=`Both sexes`, group=Country)) +"
+"0","  geom_line(linewidth=0.1) +"
+"0","  facet_wrap(~RegionName)"

@@ -1,0 +1,6 @@
+"0","life_birth |> "
+"0","  select(-FactValueNumeric, -Dim1ValueCode, -DateModified) |>"
+"0","  rename(Region = ParentLocationCode,"
+"0","         Country = SpatialDimValueCode,"
+"0","         Year = Period,"
+"0","         Attribute = Dim1)"

@@ -1,0 +1,1 @@
+"0","all_na_lambda <- \(my_var) all(is.na(my_var))"

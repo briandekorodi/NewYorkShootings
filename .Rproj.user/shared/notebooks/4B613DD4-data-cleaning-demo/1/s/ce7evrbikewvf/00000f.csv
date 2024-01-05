@@ -1,0 +1,5 @@
+"0","## this function returns TRUE is all the values of my_var are NA"
+"0","all_na <- function(my_var) {"
+"0","  my_var |> "
+"0","    is.na() |> all()"
+"0","}"

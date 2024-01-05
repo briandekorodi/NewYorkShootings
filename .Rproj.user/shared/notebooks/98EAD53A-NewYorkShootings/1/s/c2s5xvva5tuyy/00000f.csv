@@ -1,0 +1,19 @@
+"0","basic_info <- clean_data |>"
+"0","  summarise(""Name of the file"" = gsub("".csv"","""", list.files(""data"")),"
+"0","            ""File content"" = ""Reported shooting incidents in New York City"","
+"0","            ""Number of observations"" = nrow(clean_data),"
+"0","            ""Number of variables"" = ncol(clean_data),"
+"0","            ""Date of first observation"" = last(OCCUR_DATE),"
+"0","            ""Date of last observation"" = first(OCCUR_DATE),"
+"0","            ""Number of numerical variables"" = length(select_if(clean_data,is.numeric)),"
+"0","            ""Number of character variables"" = length(select_if(clean_data,is.character)),"
+"0","            ""Number of logical variables"" = length(select_if(clean_data,is.logical)),"
+"0","            ""Number of time variables"" = length(select_if(clean_data,is_hms)),"
+"0","            ""Proportion of missing values"" = (sum(is.na(clean_data)))/((nrow(clean_data))*(ncol(clean_data))))"
+"0","knitr::kable(basic_info)"
+"2","Registered S3 methods overwritten by 'htmltools':
+  method               from         
+  print.html           tools:rstudio
+  print.shiny.tag      tools:rstudio
+  print.shiny.tag.list tools:rstudio
+"

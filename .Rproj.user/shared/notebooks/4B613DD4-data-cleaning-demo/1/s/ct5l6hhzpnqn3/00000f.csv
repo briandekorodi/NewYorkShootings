@@ -1,0 +1,4 @@
+"0","life_birth[[""life_expectancy""]] |> "
+"0","  filter(Attribute==""Both sexes"") |>"
+"0","  pivot_wider(id_cols = Country, values_from = Value, names_from =Year) |> "
+"0","  View()"

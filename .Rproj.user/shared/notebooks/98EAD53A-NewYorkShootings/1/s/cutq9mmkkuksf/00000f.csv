@@ -1,0 +1,11 @@
+"0","raw_data <- vroom(""data/NYPD_Shooting_Incident_Data__Historic.csv"")"
+"2","[1mRows: [22m[34m27312[39m [1mColumns: [22m[34m21[39m"
+"2","[36m──[39m [1mColumn specification[22m [36m─────────────────────────────────────────────────────────────────────────[39m
+[1mDelimiter:[22m "";""
+[31mchr[39m  (12): OCCUR_DATE, BORO, LOC_OF_OCCUR_DESC, LOC_CLASSFCTN_DESC, LOCATION_DESC, PERP_AGE_G...
+[32mdbl[39m   (7): INCIDENT_KEY, PRECINCT, JURISDICTION_CODE, X_COORD_CD, Y_COORD_CD, Latitude, Longi...
+[33mlgl[39m   (1): STATISTICAL_MURDER_FLAG
+[34mtime[39m  (1): OCCUR_TIME"
+"2","
+[36mℹ[39m Use `spec()` to retrieve the full column specification for this data.
+[36mℹ[39m Specify the column types or set `show_col_types = FALSE` to quiet this message."

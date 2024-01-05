@@ -97,29 +97,6 @@ We create a new dataset on which we will implement our cleaning steps.
 clean_data <- raw_data
 ```
 
-\### Wrong types
-
-Depending on the computer, he variable OCCUR_TIME may have a double type, which means its values take on a "... secs" format, rather than a "hours/minutes/seconds" format. This not very readable.
-
-```{r}
-#In case this issue arises
-#clean_data[["OCCUR_TIME"]] |> typeof()
-```
-
-We us as_hms to convert it from double to time.
-
-```{r}
-#In case this issue arises
-library(hms)
-clean_data[["OCCUR_TIME"]] <- clean_data[["OCCUR_TIME"]] |> as_hms()
-```
-
-we change the type of OCCUR_DATE from character to date.
-
-```{r}
-clean_data[["OCCUR_DATE"]] <- clean_data[["OCCUR_DATE"]] |> as.Date(format="%m/%d/%y")
-```
-
 ### Inconsistent labeling of missing values
 
 The dataset contains some inconsistencies in the entry of missing values. Some missing values are labeled NA, while others are labeled with some other character value, such as "(null)", "UNKNOWN", "U", or "OTHER". We convert all of these to NA.
@@ -226,6 +203,29 @@ clean_data <- clean_data |>
                                 "SOCIAL CLUB/POLICY LOCATI" = "SOCIAL CLUB/POLICY LOCATION"))
 ```
 
+### Wrong types
+
+Depending on the computer, he variable OCCUR_TIME may have a double type, which means its values take on a "... secs" format, rather than a "hours/minutes/seconds" format. This not very readable.
+
+```{r}
+#In case this issue arises
+#clean_data[["OCCUR_TIME"]] |> typeof()
+```
+
+We us as_hms to convert it from double to time.
+
+```{r}
+#In case this issue arises
+library(hms)
+clean_data[["OCCUR_TIME"]] <- clean_data[["OCCUR_TIME"]] |> as_hms()
+```
+
+we change the type of OCCUR_DATE from character to date.
+
+```{r}
+clean_data[["OCCUR_DATE"]] <- clean_data[["OCCUR_DATE"]] |> as.Date(format="%m/%d/%Y")
+```
+
 ## Basic information about the data file
 
 ```{r}
@@ -267,37 +267,67 @@ On this note, we will attempt to further deconstruct the patterns behind this re
 
 ### Shootings over time in New York City
 
+Without any grouping :
+
 ```{r}
 clean_data |>
-  mutate("year"=gsub(".*/", "", OCCUR_DATE)) |>
-  select(`year`) |>
-  group_by(`year`) |>
+  group_by(OCCUR_DATE) |>
   summarise("Shooting incidents" = n()) |>
-  ggplot(aes(x = `year`, y = `Shooting incidents`)) +
-  geom_col()
+  ggplot(aes(x = `OCCUR_DATE`, y = `Shooting incidents`)) +
+  geom_line() 
+```
+
+clearly there are too many dates...
+
+Grouping by year :
+
+```{r}
+library(lubridate)
+
+  clean_data |>
+  select(OCCUR_DATE) |>
+  mutate('year'=year(OCCUR_DATE))|>
+  group_by(year)|>
+  summarise('Number of shootings'= n()) |>
+  ggplot(aes(x=year, y=`Number of shootings`)) +
+    geom_line() + 
+    geom_point() +
+    scale_x_continuous(breaks=c(seq(2006,2022,by=1))) +
+    labs(title="Number of shooting incidents in NYC over the years ")
+```
+
+Grouping by year and by Boroughs :
+
+```{r}
+ clean_data |>
+  select(OCCUR_DATE, BORO) |>
+  mutate('year'=year(OCCUR_DATE))|>
+  group_by(year, BORO)|>
+  summarise('Number of shootings'= n()) |>
+  ggplot(aes(x=year, y=`Number of shootings`, group=BORO, color=BORO)) +
+    geom_line() + 
+    geom_point() +
+    scale_x_continuous(breaks=c(seq(2006,2022,by=2))) +
+    labs(title="Number of shooting incidents by boroughs over the years ")
 ```
 
 ### It's cold outside: Average shootings by month of the year
 
 ```{r}
+months_association <- data.frame("month name"=c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"), "month"=c(1,2,3,4,5,6,7,8,9,10,11,12)
+)
+```
+
+```{r}
+library(tidyverse) 
+
 clean_data |>
-  mutate("month"=substr(OCCUR_DATE, 1, 2)) |>
-  select(`month`) |>
-  recode(month,
-         01 = "Jan",
-         02 = "Feb",
-         03 = "Mar",
-         04 = "Apr",
-         05 = "May",
-         06 = "Jun",
-         07 = "Jul",
-         08 = "Aug",
-         09 = "Sep",
-         10 = "Oct",
-         11 = "Nov",
-         12 = "Dec") |>
-  group_by(`month`) |>
-  summarise("Shooting incidents" = (n()/16)) |>
-  ggplot(aes(x = `month`, y = `Shooting incidents`)) +
-  geom_col()
+  select(OCCUR_DATE) |>
+  mutate('month'=month(OCCUR_DATE))|>
+  group_by(month)|>
+  summarise('Average number of shooting incidents'= n()/16) |>
+  left_join(months_association) |>
+  ggplot(aes(x=fct_inorder(month.name), y=`Average number of shooting incidents`)) +
+  geom_col() +
+  labs(x="Month", title="Average number of shooting incidents per month in NYC", subtitle="over the period 2006-2022")
 ```

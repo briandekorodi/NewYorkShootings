@@ -1,0 +1,7 @@
+"0","clean_data |>"
+"0","  mutate(""month""=substr(OCCUR_DATE, 1, 2)) |>"
+"0","  select(`month`) |>"
+"0","  group_by(`month`) |>"
+"0","  summarise(""Shooting incidents"" = (n()/16)) |>"
+"0","  ggplot(aes(x = `month`, y = `Shooting incidents`)) +"
+"0","  geom_col()"

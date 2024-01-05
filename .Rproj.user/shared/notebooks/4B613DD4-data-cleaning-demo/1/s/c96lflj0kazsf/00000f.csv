@@ -1,0 +1,11 @@
+"0","life <- vroom(here(""data"", ""life expectancy raw.csv""))"
+"2","[1mRows: [22m[34m4393[39m [1mColumns: [22m[34m34[39m"
+"2","[36m──[39m [1mColumn specification[22m [36m────────────────────────────────────────────────────────────────────────────[39m
+[1mDelimiter:[22m "",""
+[31mchr[39m  (13): IndicatorCode, Indicator, ValueType, ParentLocationCode, ParentLocation, Location typ...
+[32mdbl[39m   (3): Period, FactValueNumeric, Value
+[33mlgl[39m  (17): IsLatestYear, Dim2 type, Dim2, Dim2ValueCode, Dim3 type, Dim3, Dim3ValueCode, DataSou...
+[34mdttm[39m  (1): DateModified"
+"2","
+[36mℹ[39m Use `spec()` to retrieve the full column specification for this data.
+[36mℹ[39m Specify the column types or set `show_col_types = FALSE` to quiet this message."
