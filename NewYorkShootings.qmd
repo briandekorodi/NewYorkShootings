@@ -331,3 +331,75 @@ clean_data |>
   geom_col() +
   labs(x="Month", title="Average number of shooting incidents per month in NYC", subtitle="over the period 2006-2022")
 ```
+
+### Shooting incidents in NYC during each US President's term
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(lubridate)
+
+presidents <- clean_data |>
+  select(OCCUR_DATE) |>
+  mutate('year'=year(OCCUR_DATE))|>
+  group_by(year)|>
+  summarise('Number of shootings'= n()) |>
+  ggplot(aes(x=year, y=`Number of shootings`)) +
+    geom_line() + 
+    geom_point() +
+    scale_x_continuous(breaks=c(seq(2006,2022,by=1))) +
+    labs(title="Number of shooting incidents in NYC over the years ") +
+    geom_vline(xintercept = 2006) +
+    geom_vline(xintercept = 2009) +
+    geom_vline(xintercept = 2017) +
+    geom_vline(xintercept = 2019) +
+    geom_vline(xintercept = 2021)
+  
+install.packages("png")
+library(png)
+
+here::i_am("NewYorkShootings.Rproj")
+
+
+Bush_img <- readPNG("pngimg.com - geaorge_bush_PNG16.png", native = TRUE)
+Obama_img <- readPNG("pngwing.com.png", native = TRUE)
+Trump_img <- readPNG("trump.png", native = TRUE)
+Covid_img <- readPNG("covid.png", native = TRUE)
+Biden_img <- readPNG("joe-biden-40972.png", native = TRUE)
+
+
+install.packages("patchwork")
+library(patchwork)
+
+presidents_img <- presidents +                   
+  inset_element(p = Bush_img, 
+                left = 0.1, 
+                bottom = 0.5, 
+                right = 0.2, 
+                top = 0.35) +                   
+  inset_element(p = Obama_img, 
+                left = 0.25, 
+                bottom = 0.5, 
+                right = 0.4, 
+                top = 0.01) +                   
+  inset_element(p = Trump_img,
+                left = 0.8, 
+                bottom = 0.2, 
+                right = 0.75, 
+                top = 0.7) +                   
+  inset_element(p = Covid_img, 
+                left = 0.9, 
+                bottom = 0.6, 
+                right = 0.8, 
+                top = 0.7) +                   
+  inset_element(p = Biden_img, 
+                left = 0.91, 
+                bottom = 0.4, 
+                right = 0.99, 
+                top = 0.65) 
+
+print(presidents_img)
+
+
+```
