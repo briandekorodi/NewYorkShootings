@@ -270,7 +270,11 @@ On this note, we will attempt to further deconstruct the patterns behind this re
 Without any grouping :
 
 ```{r}
+library(lubridate)
+
 clean_data |>
+  mutate("year"=year(OCCUR_DATE)) |>
+  #filter(year == 2020) |>
   group_by(OCCUR_DATE) |>
   summarise("Shooting incidents" = n()) |>
   ggplot(aes(x = `OCCUR_DATE`, y = `Shooting incidents`)) +
@@ -403,3 +407,114 @@ print(presidents_img)
 
 
 ```
+
+### Time of shootings
+
+Distribution of OCCUR_TIME conditioned on the boroughs :
+
+```{r}
+clean_data |>
+  #select(OCCUR_TIME) |>
+  mutate("hour"=hour(OCCUR_TIME)) |>
+  ggplot(aes(x=hour)) +
+  geom_bar()+
+  facet_wrap(~BORO, nrow=4)
+```
+
+In the five boroughs, most shootings occur in the evening and at night.
+
+### Who shoots who ?
+
+The dataset contains three categorical variables that allow us to analyse the profiles of offenders and victims : sex, age group and race.
+
+```{r}
+knitr::kable(
+head(
+clean_data |>
+  group_by(VIC_SEX, VIC_RACE, VIC_AGE_GROUP, PERP_SEX, PERP_RACE, PERP_AGE_GROUP) |>
+  summarise('Number of shootings'=n()) |>
+  arrange(-`Number of shootings`, by_groups=TRUE), n=10)
+)
+```
+
+Between 2006 and 2022, black males aged between 25 and 44 were the victims of the most shootings, but it also them who committed the most shootings (right after NA values).
+
+#### Age groups
+
+PERP_AGE_GROUP conditioned on VIC_AGE_GROUP
+
+```{r}
+clean_data |>
+  select(VIC_AGE_GROUP, PERP_AGE_GROUP) |> 
+  filter(!is.na(VIC_AGE_GROUP) & !is.na(PERP_AGE_GROUP)) |>
+  ggplot(aes(x=VIC_AGE_GROUP, fill=PERP_AGE_GROUP)) + 
+  geom_bar(position="fill") +
+  geom_text(aes(label=after_stat(count)), stat="count", position=position_fill(vjust=0.5))
+
+```
+
+When not taking NA values into account :
+
+Most victims, regardless of their age group, are mostly shot by people aged between 18-24 and 25-44.
+
+However, as a victim gets older, it becomes more likely that they are shot by an older person (aged 45-64 or 65+) and less likely that they are shot by a younger person (\<18). Conversely, younger victims are those who are the most likely to get shot by teenagers.
+
+#### Sex
+
+VIC_SEX conditioned on PERP_SEX :
+
+```{r}
+clean_data |>
+  select(VIC_SEX, PERP_SEX) |> 
+  filter(!is.na(VIC_SEX) & !is.na(PERP_SEX)) |>
+  ggplot(aes(x=PERP_SEX, fill=VIC_SEX)) + 
+  geom_bar(position="fill") +
+  geom_text(aes(label=..count..), stat="count", position=position_fill(vjust=0.5))
+```
+
+When not taking NA values into account : most shootings are committed by men, and most of the victims of shootings (whether they are committed by men or women) are also men.
+
+#### Race
+
+PERP_RACE conditioned on VIC_RACE
+
+```{r}
+clean_data |>
+  select(VIC_RACE, PERP_RACE) |> 
+  filter(!is.na(VIC_RACE) & !is.na(PERP_RACE)) |>
+  ggplot(aes(y=VIC_RACE, fill=PERP_RACE)) + 
+  geom_bar(position="fill")
+  #options(repr.plot.width=15, repr.plot.height=8)
+```
+
+Again, not taking NA values into account :
+
+There seems to be a link between the races of victims and offenders. A victim of a given race is more likely to be shot by someone of that same race than a victim of any another race. For example, a white victim is more likely to get shot by a white offender than a black or a white Hispanic victim. This observation isn't true for American Indian/Alaskan native victims, but the number of shootings involving them is also small (only 4 observations).
+
+```{r}
+clean_data |>
+  select(VIC_RACE, PERP_RACE) |> 
+  filter(!is.na(VIC_RACE) & !is.na(PERP_RACE) & VIC_RACE == "AMERICAN INDIAN/ALASKAN NATIVE") |>
+  group_by(VIC_RACE, PERP_RACE) |>
+  summarise('Number of SHootings'=n())
+```
+
+Furthermore, all races of victims are quite likely to be shot by a black offender (green areas take sufficient space for all victims).
+
+PERP_RACE conditioned on VIC_RACE and BORO
+
+```{r}
+
+clean_data |>
+  select(VIC_RACE, PERP_RACE, BORO) |> 
+  filter(!is.na(VIC_RACE) & !is.na(PERP_RACE)) |>
+  ggplot(aes(y=VIC_RACE, fill=PERP_RACE)) + 
+  geom_bar(position="fill") +
+  theme(text=element_text(size=8)) +
+  facet_wrap(~BORO, nrow=5)
+
+```
+
+The same observation as before can be made here : in all boroughs (except for Staten Island, which is also the borough with the less shooting incidents, cf graph of shooting incidents over the years by boroughs) a victim of a given race is more likely to be shot by someone of that same race than a victim of another race. This is particularly visible for black victims who in all boroughs are very likely to get shot by a black offender.
+
+Again, all races of victims are quite likely to be shot by a black offender in all boroughs (except for Asian/Pacific Islander in Staten Island).
