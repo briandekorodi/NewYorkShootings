@@ -270,7 +270,11 @@ On this note, we will attempt to further deconstruct the patterns behind this re
 Without any grouping :
 
 ```{r}
+library(lubridate)
+
 clean_data |>
+  mutate("year"=year(OCCUR_DATE)) |>
+  #filter(year == 2020) |>
   group_by(OCCUR_DATE) |>
   summarise("Shooting incidents" = n()) |>
   ggplot(aes(x = `OCCUR_DATE`, y = `Shooting incidents`)) +
