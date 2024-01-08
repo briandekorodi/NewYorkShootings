@@ -408,7 +408,7 @@ print(presidents_img)
 
 ```
 
-### Time of shootings
+### Get a good night's sleep, nothing good happens after midnight: Time of shootings
 
 Distribution of OCCUR_TIME conditioned on the boroughs :
 
@@ -425,7 +425,7 @@ In the five boroughs, most shootings occur in the evening and at night.
 
 ### Who shoots who ?
 
-The dataset contains three categorical variables that allow us to analyse the profiles of offenders and victims : sex, age group and race.
+The data set contains three categorical variables that allow us to analyse the profiles of offenders and victims : sex, age group and race.
 
 ```{r}
 knitr::kable(
@@ -474,7 +474,7 @@ clean_data |>
 
 When not taking NA values into account : most shootings are committed by men, and most of the victims of shootings (whether they are committed by men or women) are also men.
 
-#### Race
+#### Is gun violence inclusive? Shootings between and across racial groups
 
 PERP_RACE conditioned on VIC_RACE
 
