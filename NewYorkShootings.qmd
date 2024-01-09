@@ -714,5 +714,5 @@ knitr::kable(
   mutate('pct' = (round(`Number of shootings`/sum(`Number of shootings`), 2)))
 )
 ```
-We see that no matter which bourough, a vast majority of shootings happen in homes.
+We see that no matter which bourough, a vast majority (almost 80%) of shootings happen in homes.
 
