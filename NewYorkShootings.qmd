@@ -612,8 +612,107 @@ clean_data |>
                                 "LOAN COMPANY" = "Commerce",				
                                 "SCHOOL" = "School",				
                                 "STORAGE FACILITY" = "Misc")) |>
+  filter(!is.na(LOCATION_DESC) & !is.na(PERP_RACE)) |>
+  ggplot(aes(x=LOCATION_DESC)) +
+  geom_bar() +
+  facet_wrap(~ PERP_RACE, nrow = 6)
+```
+
+```{r}
+clean_data |>
+  mutate(LOCATION_DESC = recode(LOCATION_DESC, "MULTI DWELL - PUBLIC HOUSE" =  "Home",
+                                "MULTI DWELL - APT BUILD" = "Home",
+                                "PVT HOUSE" = "Home",
+                                "SMALL MERCHANT" = "Commerce",
+                                "HOTEL/MOTEL" = "Hotel",
+                                "HOSPITAL" = "Hospital",
+                                "BAR/NIGHT CLUB" = "Night life",
+                                "BEAUTY/NAIL SALON" = "Commerce",
+                                "STORE UNCLASSIFIED" = "Store",
+                                "RESTAURANT/DINER" = "Restaurant",
+                                "GROCERY/BODEGA" = "Store",
+                                "SOCIAL CLUB/POLICY LOCATION" = "Misc",
+                                "JEWELRY STORE" = "Store",
+                                "COMMERCIAL BLDG" = "Commerce",
+                                "SUPERMARKET" = "Store",
+                                "DRY CLEANER/LAUNDRY" = "Commerce",
+                                "GAS STATION" = "Commerce",
+                                "LIQUOR STORE" = "Store",
+                                "CLOTHING BOUTIQUE" = "Store",
+                                "FACTORY/WAREHOUSE" = "Commerce",
+                                "FAST FOOD" = "Store",
+                                "DRUG STORE" = "Store",				
+                                "CHECK CASH" = "Finance",				
+                                "VARIETY STORE" = "Store",				
+                                "BANK" = "Finance",				
+                                "ATM" = "Finance",				
+                                "CANDY STORE" = "Store",			
+                                "VIDEO STORE" = "Store",				
+                                "SHOE STORE" = "Store",
+                                "PHOTO/COPY STORE" = "Store",				
+                                "DEPT STORE" = "Store",				
+                                "GYM/FITNESS FACILITY" = "Commerce",				
+                                "CHAIN STORE" = "Store",				
+                                "DOCTOR/DENTIST" = "Commerce",				
+                                "TELECOMM. STORE" = "Store",				
+                                "LOAN COMPANY" = "Commerce",				
+                                "SCHOOL" = "School",				
+                                "STORAGE FACILITY" = "Misc")) |>
   filter(!is.na(LOCATION_DESC)) |>
   ggplot(aes(x=LOCATION_DESC)) +
   geom_bar() +
-  facet_grid(BORO ~ PERP_RACE)
+  facet_wrap(~ BORO, nrow = 5)
 ```
+
+Location as a percentage of the shootings in each neighbourhood.
+
+```{r}
+knitr::kable(
+  clean_data |>
+  mutate(LOCATION_DESC = recode(LOCATION_DESC, "MULTI DWELL - PUBLIC HOUSE" =  "Home",
+                                "MULTI DWELL - APT BUILD" = "Home",
+                                "PVT HOUSE" = "Home",
+                                "SMALL MERCHANT" = "Commerce",
+                                "HOTEL/MOTEL" = "Hotel",
+                                "HOSPITAL" = "Hospital",
+                                "BAR/NIGHT CLUB" = "Night life",
+                                "BEAUTY/NAIL SALON" = "Commerce",
+                                "STORE UNCLASSIFIED" = "Store",
+                                "RESTAURANT/DINER" = "Restaurant",
+                                "GROCERY/BODEGA" = "Store",
+                                "SOCIAL CLUB/POLICY LOCATION" = "Misc",
+                                "JEWELRY STORE" = "Store",
+                                "COMMERCIAL BLDG" = "Commerce",
+                                "SUPERMARKET" = "Store",
+                                "DRY CLEANER/LAUNDRY" = "Commerce",
+                                "GAS STATION" = "Commerce",
+                                "LIQUOR STORE" = "Store",
+                                "CLOTHING BOUTIQUE" = "Store",
+                                "FACTORY/WAREHOUSE" = "Commerce",
+                                "FAST FOOD" = "Store",
+                                "DRUG STORE" = "Store",				
+                                "CHECK CASH" = "Finance",				
+                                "VARIETY STORE" = "Store",				
+                                "BANK" = "Finance",				
+                                "ATM" = "Finance",				
+                                "CANDY STORE" = "Store",			
+                                "VIDEO STORE" = "Store",				
+                                "SHOE STORE" = "Store",
+                                "PHOTO/COPY STORE" = "Store",				
+                                "DEPT STORE" = "Store",				
+                                "GYM/FITNESS FACILITY" = "Commerce",				
+                                "CHAIN STORE" = "Store",				
+                                "DOCTOR/DENTIST" = "Commerce",				
+                                "TELECOMM. STORE" = "Store",				
+                                "LOAN COMPANY" = "Commerce",				
+                                "SCHOOL" = "School",				
+                                "STORAGE FACILITY" = "Misc")) |>
+  filter(!is.na(LOCATION_DESC) & !is.na(BORO) & !is.na(PERP_SEX)) |>
+  group_by(BORO, LOCATION_DESC) |>
+  summarise('Number of shootings'= n()) |>
+  group_by(BORO) |>
+  mutate('pct' = (round(`Number of shootings`/sum(`Number of shootings`), 2)))
+)
+```
+We see that no matter which bourough, a vast majority of shootings happen in homes.
+
