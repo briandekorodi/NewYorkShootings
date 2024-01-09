@@ -447,7 +447,7 @@ PERP_AGE_GROUP conditioned on VIC_AGE_GROUP
 clean_data |>
   select(VIC_AGE_GROUP, PERP_AGE_GROUP) |> 
   filter(!is.na(VIC_AGE_GROUP) & !is.na(PERP_AGE_GROUP)) |>
-  ggplot(aes(x=VIC_AGE_GROUP, fill=PERP_AGE_GROUP)) + 
+  ggplot(aes(x=VIC_AGE_GROUP, fill= PERP_AGE_GROUP)) + 
   geom_bar(position="fill") +
   geom_text(aes(label=after_stat(count)), stat="count", position=position_fill(vjust=0.5))
 
@@ -664,7 +664,7 @@ clean_data |>
   facet_wrap(~ BORO, nrow = 5)
 ```
 
-Location as a percentage of the shootings in each neighbourhood.
+Location as a percentage of the shootings in each neighbour hood.
 
 ```{r}
 knitr::kable(
@@ -714,5 +714,5 @@ knitr::kable(
   mutate('pct' = (round(`Number of shootings`/sum(`Number of shootings`), 2)))
 )
 ```
-We see that no matter which bourough, a vast majority (almost 80%) of shootings happen in homes.
 
+We see that no matter which bourough, a vast majority (almost 80%) of shootings happen in homes.
