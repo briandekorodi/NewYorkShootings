@@ -518,3 +518,102 @@ clean_data |>
 The same observation as before can be made here : in all boroughs (except for Staten Island, which is also the borough with the less shooting incidents, cf graph of shooting incidents over the years by boroughs) a victim of a given race is more likely to be shot by someone of that same race than a victim of another race. This is particularly visible for black victims who in all boroughs are very likely to get shot by a black offender.
 
 Again, all races of victims are quite likely to be shot by a black offender in all boroughs (except for Asian/Pacific Islander in Staten Island).
+
+### Stay home, be safe... or don't?
+
+```{r}
+clean_data |>
+  distinct(LOCATION_DESC) 
+```
+
+```{r}
+clean_data |>
+  mutate(LOCATION_DESC = recode(LOCATION_DESC, "MULTI DWELL - PUBLIC HOUSE" =  "Home",
+                                "MULTI DWELL - APT BUILD" = "Home",
+                                "PVT HOUSE" = "Home",
+                                "SMALL MERCHANT" = "Commerce",
+                                "HOTEL/MOTEL" = "Hotel",
+                                "HOSPITAL" = "Hospital",
+                                "BAR/NIGHT CLUB" = "Night life",
+                                "BEAUTY/NAIL SALON" = "Commerce",
+                                "STORE UNCLASSIFIED" = "Store",
+                                "RESTAURANT/DINER" = "Restaurant",
+                                "GROCERY/BODEGA" = "Store",
+                                "SOCIAL CLUB/POLICY LOCATION" = "Misc",
+                                "JEWELRY STORE" = "Store",
+                                "COMMERCIAL BLDG" = "Commerce",
+                                "SUPERMARKET" = "Store",
+                                "DRY CLEANER/LAUNDRY" = "Commerce",
+                                "GAS STATION" = "Commerce",
+                                "LIQUOR STORE" = "Store",
+                                "CLOTHING BOUTIQUE" = "Store",
+                                "FACTORY/WAREHOUSE" = "Commerce",
+                                "FAST FOOD" = "Store",
+                                "DRUG STORE" = "Store",				
+                                "CHECK CASH" = "Finance",				
+                                "VARIETY STORE" = "Store",				
+                                "BANK" = "Finance",				
+                                "ATM" = "Finance",				
+                                "CANDY STORE" = "Store",			
+                                "VIDEO STORE" = "Store",				
+                                "SHOE STORE" = "Store",
+                                "PHOTO/COPY STORE" = "Store",				
+                                "DEPT STORE" = "Store",				
+                                "GYM/FITNESS FACILITY" = "Commerce",				
+                                "CHAIN STORE" = "Store",				
+                                "DOCTOR/DENTIST" = "Commerce",				
+                                "TELECOMM. STORE" = "Store",				
+                                "LOAN COMPANY" = "Commerce",				
+                                "SCHOOL" = "School",				
+                                "STORAGE FACILITY" = "Misc")) |>
+    filter(!is.na(LOCATION_DESC)) |>
+  ggplot(aes(x=LOCATION_DESC)) +
+  geom_bar()
+
+```
+
+```{r}
+clean_data |>
+  mutate(LOCATION_DESC = recode(LOCATION_DESC, "MULTI DWELL - PUBLIC HOUSE" =  "Home",
+                                "MULTI DWELL - APT BUILD" = "Home",
+                                "PVT HOUSE" = "Home",
+                                "SMALL MERCHANT" = "Commerce",
+                                "HOTEL/MOTEL" = "Hotel",
+                                "HOSPITAL" = "Hospital",
+                                "BAR/NIGHT CLUB" = "Night life",
+                                "BEAUTY/NAIL SALON" = "Commerce",
+                                "STORE UNCLASSIFIED" = "Store",
+                                "RESTAURANT/DINER" = "Restaurant",
+                                "GROCERY/BODEGA" = "Store",
+                                "SOCIAL CLUB/POLICY LOCATION" = "Misc",
+                                "JEWELRY STORE" = "Store",
+                                "COMMERCIAL BLDG" = "Commerce",
+                                "SUPERMARKET" = "Store",
+                                "DRY CLEANER/LAUNDRY" = "Commerce",
+                                "GAS STATION" = "Commerce",
+                                "LIQUOR STORE" = "Store",
+                                "CLOTHING BOUTIQUE" = "Store",
+                                "FACTORY/WAREHOUSE" = "Commerce",
+                                "FAST FOOD" = "Store",
+                                "DRUG STORE" = "Store",				
+                                "CHECK CASH" = "Finance",				
+                                "VARIETY STORE" = "Store",				
+                                "BANK" = "Finance",				
+                                "ATM" = "Finance",				
+                                "CANDY STORE" = "Store",			
+                                "VIDEO STORE" = "Store",				
+                                "SHOE STORE" = "Store",
+                                "PHOTO/COPY STORE" = "Store",				
+                                "DEPT STORE" = "Store",				
+                                "GYM/FITNESS FACILITY" = "Commerce",				
+                                "CHAIN STORE" = "Store",				
+                                "DOCTOR/DENTIST" = "Commerce",				
+                                "TELECOMM. STORE" = "Store",				
+                                "LOAN COMPANY" = "Commerce",				
+                                "SCHOOL" = "School",				
+                                "STORAGE FACILITY" = "Misc")) |>
+  filter(!is.na(LOCATION_DESC)) |>
+  ggplot(aes(x=LOCATION_DESC)) +
+  geom_bar() +
+  facet_wrap(~BORO, nrow = 5)
+```
