@@ -265,7 +265,7 @@ Nothing illustrates the tight link between New York City and its history of gun 
 
 On this note, we will attempt to further deconstruct the patterns behind this remarkable data.
 
-### NA values 
+### NA values
 
 ```{r}
 library(tidyverse)
@@ -370,7 +370,6 @@ presidents <- clean_data |>
     geom_vline(xintercept = 2006, color = "red") +
     geom_vline(xintercept = 2009, color = "red") +
     geom_vline(xintercept = 2017, color = "red") +
-    geom_vline(xintercept = 2019, color = "red") +
     geom_vline(xintercept = 2021, color = "red")
   
 install.packages("png")
@@ -396,20 +395,20 @@ presidents_img <- presidents +
                 right = 0.2, 
                 top = 0.35) +                   
   inset_element(p = Obama_img, 
-                left = 0.25, 
-                bottom = 0.5, 
+                left = 0.225, 
+                bottom = 0.35, 
                 right = 0.4, 
                 top = 0.01) +                   
   inset_element(p = Trump_img,
-                left = 0.8, 
-                bottom = 0.2, 
-                right = 0.75, 
-                top = 0.7) +                   
+                left = 0.69, 
+                bottom = 0.15, 
+                right = 0.78, 
+                top = 0.6) +                   
   inset_element(p = Covid_img, 
-                left = 0.9, 
-                bottom = 0.6, 
-                right = 0.8, 
-                top = 0.7) +                   
+                left = 0.8, 
+                bottom = 0.98, 
+                right = 0.85, 
+                top = 0.9) +                   
   inset_element(p = Biden_img, 
                 left = 0.91, 
                 bottom = 0.4, 
