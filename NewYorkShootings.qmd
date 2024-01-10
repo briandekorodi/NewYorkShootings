@@ -338,6 +338,21 @@ knitr::kable(
 )
 ```
 
+### EXAMPLE OF CODE FOR ANIMATED MAP
+
+```{r}
+facet_anim = 
+  tm_shape(usbj_contig9311) +
+  tm_polygons(fill = "population",
+              fill.scale = tm_scale(values = pal, breaks = pb, label.na = FALSE)) +
+  tm_facets(by = "year", nrow = 1, ncol = 1, free.coords = FALSE) +
+  tm_shape(usa_union) + 
+  tm_borders(lwd = 2) +
+  tm_layout(legend.position = c("left", "bottom"), legend.frame = FALSE)
+
+tmap_animation(tm = facet_anim, filename = "09-us_pop.gif", width = 900, height = 600)
+```
+
 ### It's cold outside: Average shootings by month of the year
 
 ```{r}
