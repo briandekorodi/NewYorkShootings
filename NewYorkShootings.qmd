@@ -328,6 +328,16 @@ Grouping by year and by Boroughs :
     labs(title="Number of shooting incidents by boroughs over the years ")
 ```
 
+### Shootings by precinct
+
+```{r}
+knitr::kable(
+  clean_data |>
+    group_by(PRECINCT) |>
+    summarise('Number of shootings' = n())
+)
+```
+
 ### It's cold outside: Average shootings by month of the year
 
 ```{r}
