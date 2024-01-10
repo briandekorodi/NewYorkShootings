@@ -265,6 +265,19 @@ Nothing illustrates the tight link between New York City and its history of gun 
 
 On this note, we will attempt to further deconstruct the patterns behind this remarkable data.
 
+### NA values 
+
+```{r}
+library(tidyverse)
+
+clean_data |>
+  summarise_all(~ sum(is.na(.))/nrow(clean_data)) |>
+  pivot_longer(cols = 1:21, names_to = "Variable", values_to = "NA proportion") |>
+  ggplot(aes(y=Variable, x=`NA proportion`)) +
+  geom_col() +
+  labs(title="Proportion of NA values per variable")
+```
+
 ### Shootings over time in New York City
 
 Without any grouping :
