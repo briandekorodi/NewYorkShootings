@@ -345,19 +345,88 @@ knitr::kable(clean_data |>
 
 The table confirms the above statement: out of a total of 77 police precincts in New York City, there is a group of 14 that account for over 50% of the total shooting incidents from 2006 - 2022.
 
+### Decrease in gun violence 2006-2019, looking at precincts
+
+```{r}
+violent_precincts <- c("75", "73", "67", "44", "79", "47", "40", "46", "42", "113", "81", "77", "48", "43")
+mid_upper_violent_precincts <- c("32","103","52","71","120","83","41","101","23","105","69","25","70","60","114","49","28","34","90","63","88","30","33","106")
+mid_lower_violent_precincts <- c("102","45","115","100","76","110","50","61","26","84","109","121","7","9","72","24","104","107","94","10","62","108","78","13","122")
+nonviolent_precincts <- c("5","14","66","20","18","68","123","6","1","112","19","17","111","22")
+```
+
+```{r}
+ clean_data |>
+  select(OCCUR_DATE, PRECINCT, BORO) |>
+  filter(PRECINCT %in% violent_precincts) |>
+  mutate('year'=year(OCCUR_DATE))|>
+  filter(`year` < 2020) |>
+  group_by(year, PRECINCT, BORO)|>
+  summarise('Number of shootings'= n()) |>
+  ggplot(aes(x=year, y=`Number of shootings`, group=PRECINCT, color = BORO)) +
+    geom_line() + 
+    geom_point() +
+    scale_x_continuous(breaks=c(seq(2006,2022,by=2))) +
+    labs(title="Number of shooting incidents by precinct over the years ")
+```
+
+```{r}
+ clean_data |>
+  select(OCCUR_DATE, PRECINCT, BORO) |>
+  filter(PRECINCT %in% mid_upper_violent_precincts) |>
+  mutate('year'=year(OCCUR_DATE))|>
+  filter(`year` < 2020) |>
+  group_by(year, PRECINCT, BORO)|>
+  summarise('Number of shootings'= n()) |>
+  ggplot(aes(x=year, y=`Number of shootings`, group=PRECINCT, color = BORO)) +
+    geom_line() + 
+    geom_point() +
+    scale_x_continuous(breaks=c(seq(2006,2022,by=2))) +
+    labs(title="Number of shooting incidents by precinct over the years ")
+```
+
+```{r}
+ clean_data |>
+  select(OCCUR_DATE, PRECINCT, BORO) |>
+  filter(PRECINCT %in% mid_lower_violent_precincts) |>
+  mutate('year'=year(OCCUR_DATE))|>
+   filter(`year` < 2020) |>
+  group_by(year, PRECINCT, BORO)|>
+  summarise('Number of shootings'= n()) |>
+  ggplot(aes(x=year, y=`Number of shootings`, group=PRECINCT, color = BORO)) +
+    geom_line() + 
+    geom_point() +
+    scale_x_continuous(breaks=c(seq(2006,2022,by=2))) +
+    labs(title="Number of shooting incidents by precinct over the years ")
+```
+
+```{r}
+ clean_data |>
+  select(OCCUR_DATE, PRECINCT, BORO) |>
+  filter(PRECINCT %in% nonviolent_precincts) |>
+  mutate('year'=year(OCCUR_DATE))|>
+   filter(`year` < 2020) |>
+  group_by(year, PRECINCT, BORO)|>
+  summarise('Number of shootings'= n()) |>
+  ggplot(aes(x=year, y=`Number of shootings`, group=PRECINCT, color = BORO)) +
+    geom_line() + 
+    geom_point() +
+    scale_x_continuous(breaks=c(seq(2006,2022,by=2))) +
+    labs(title="Number of shooting incidents by precinct over the years ")
+```
+
 ### EXAMPLE OF CODE FOR ANIMATED MAP
 
 ```{r}
-facet_anim = 
-  tm_shape(usbj_contig9311) +
-  tm_polygons(fill = "population",
-              fill.scale = tm_scale(values = pal, breaks = pb, label.na = FALSE)) +
-  tm_facets(by = "year", nrow = 1, ncol = 1, free.coords = FALSE) +
-  tm_shape(usa_union) + 
-  tm_borders(lwd = 2) +
-  tm_layout(legend.position = c("left", "bottom"), legend.frame = FALSE)
+#facet_anim = 
+  #tm_shape(usbj_contig9311) +
+  #tm_polygons(fill = "population",
+              #fill.scale = tm_scale(values = pal, breaks = pb, label.na = FALSE)) +
+  #tm_facets(by = "year", nrow = 1, ncol = 1, free.coords = FALSE) +
+  #tm_shape(usa_union) + 
+  #tm_borders(lwd = 2) +
+  #tm_layout(legend.position = c("left", "bottom"), legend.frame = FALSE)
 
-tmap_animation(tm = facet_anim, filename = "09-us_pop.gif", width = 900, height = 600)
+#tmap_animation(tm = facet_anim, filename = "09-us_pop.gif", width = 900, height = 600)
 ```
 
 ### It's cold outside: Average shootings by month of the year
