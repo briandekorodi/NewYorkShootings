@@ -330,13 +330,20 @@ Grouping by year and by Boroughs :
 
 ### Shootings by precinct
 
+*“Gun violence remains a pervasive issue in small pockets of neighborhoods around New York City. The data shows that a limited number of communities have accounted for roughly 50% of NYC’s shooting incidents.”*
+
+[NYC Mayor's Office of Criminal Justice](https://criminaljustice.cityofnewyork.us/programs/office-to-prevent-gun-violence/)
+
 ```{r}
-knitr::kable(
-  clean_data |>
+knitr::kable(clean_data |>
     group_by(PRECINCT) |>
-    summarise('Number of shootings' = n())
+    summarise('Number of shootings' = n()) |>
+    mutate('pct' = round((100*(prop.table(`Number of shootings`))), 2)) |>
+    arrange(desc(`pct`))
 )
 ```
+
+The table confirms the above statement: out of a total of 77 police precincts in New York City, there is a group of 14 that account for over 50% of the total shooting incidents from 2006 - 2022.
 
 ### EXAMPLE OF CODE FOR ANIMATED MAP
 
@@ -701,7 +708,7 @@ clean_data |>
   facet_wrap(~ BORO, nrow = 5)
 ```
 
-Location as a percentage of the shootings in each neighbour hood.
+Location as a percentage of the shootings in each neighbourhood.
 
 ```{r}
 knitr::kable(
