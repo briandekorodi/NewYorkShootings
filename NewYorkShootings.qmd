@@ -964,3 +964,10 @@ knitr::kable(
 ```
 
 We see that no matter which borough, a vast majority (almost 80%) of shootings happen in homes.
+
+### Neighbourhood gentrification
+
+```{r}
+here::i_am("NewYorkShootings.Rproj")
+NTA_data <- vroom("DRI_Subindices_Indicators.csv")
+```
