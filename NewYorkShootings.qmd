@@ -371,6 +371,7 @@ nonviolent_precincts <- c("5","14","66","20","18","68","123","6","1","112","19",
   ggplot(aes(x=year, y=`Number of shootings`, group=PRECINCT, color = BORO)) +
     geom_line() + 
     geom_point() +
+    geom_smooth(aes(group = 1)) +
     scale_x_continuous(breaks=c(seq(2006,2022,by=2))) +
     labs(title="Number of shooting incidents by precinct over the years ")
 ```
@@ -386,6 +387,7 @@ nonviolent_precincts <- c("5","14","66","20","18","68","123","6","1","112","19",
   ggplot(aes(x=year, y=`Number of shootings`, group=PRECINCT, color = BORO)) +
     geom_line() + 
     geom_point() +
+    geom_smooth(aes(group = 1)) +
     scale_x_continuous(breaks=c(seq(2006,2022,by=2))) +
     labs(title="Number of shooting incidents by precinct over the years ")
 ```
@@ -401,6 +403,7 @@ nonviolent_precincts <- c("5","14","66","20","18","68","123","6","1","112","19",
   ggplot(aes(x=year, y=`Number of shootings`, group=PRECINCT, color = BORO)) +
     geom_line() + 
     geom_point() +
+    geom_smooth(aes(group = 1)) +
     scale_x_continuous(breaks=c(seq(2006,2022,by=2))) +
     labs(title="Number of shooting incidents by precinct over the years ")
 ```
@@ -416,6 +419,7 @@ nonviolent_precincts <- c("5","14","66","20","18","68","123","6","1","112","19",
   ggplot(aes(x=year, y=`Number of shootings`, group=PRECINCT, color = BORO)) +
     geom_line() + 
     geom_point() +
+    geom_smooth(aes(group = 1)) +
     scale_x_continuous(breaks=c(seq(2006,2022,by=2))) +
     labs(title="Number of shooting incidents by precinct over the years ")
 ```
@@ -482,9 +486,11 @@ nyc_nta_gen <- NTA_data |> left_join(nyc_nta, join_by(NTACode))
 
 ggplot() +
   geom_sf(data = nyc_nta_gen, aes(geometry=geometry, fill=`DisplacementRiskIndex`)) +
-  labs(title = "Gentrification risk")
+  labs(title = "Displacement risk index 2022 (Gentrification potential)")
 
 ```
+
+This information seems to point to the fact that the two most violent zones in Brooklyn and the Bronx, have not been gentrified over the time span of our study, because they are still at high risk of gentrification today.
 
 ### It's cold outside: Average shootings by month of the year
 
