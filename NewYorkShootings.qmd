@@ -447,15 +447,17 @@ shootings_precincts_per_periods <-
 ```
 
 ```{r}
-# add spacial coordinates to the previous dataset
+# add spatial coordinates to the previous dataset
 
-shootings_precincts_years <- shootings_precincts_years |> 
+shootings_precincts_per_periods <- shootings_precincts_per_periods |> 
   left_join(nyc_precincts) 
 ```
 
 ```{r}
+install.packages("sf")
+
 ggplot() +
-  geom_sf(data = shootings_precincts_years, aes(geometry=geometry, fill=`Average number of shootings`)) +
+  geom_sf(data = shootings_precincts_per_periods, aes(geometry=geometry, fill=`Average number of shootings`)) +
   facet_wrap(~ period, nrow=2) +
   scale_fill_continuous(trans = 'reverse') +
   labs(title = "Average number of shooting incidents per year in the different NYC precincts", subtitle = "over 3 periods of time")
@@ -636,7 +638,7 @@ Bill de Blasio, 2004-2021
 
 \- [CBS News](https://www.cbsnews.com/newyork/news/de-blasio-joins-mayors-against-illegal-guns-pledges-aggressive-action/), January 2014
 
-*"It's going to be a long, bloody summer in the city, Mayor Bill de Blasiowarned Monday --- while offering no new solutions on how to combat the Big Apple's staggering gun violence. \[...\] Murders have risen nearly 12 percent so far this year, too, but compared to 2019, that figure soars to nearly 50 percent. \[...\] A Brooklyn detective added that the mayor "has nerve'' to blame the city's woes on everyone and everything else."*
+*"It's going to be a long, bloody summer in the city, Mayor Bill de Blasiowarned Monday --- while offering no new solutions on how to combat the Big Apple's staggering gun violence. \[...\] Murders have risen nearly 12 percent so far this year, too, but compared to 2019, that figure soars to nearly 50 percent. \[...\] A Brooklyn detective added that the mayor"has nerve'' to blame the city's woes on everyone and everything else."*
 
 \- [The New York Post](https://nypost.com/2021/06/07/bill-de-blasio-offers-no-solution-to-surging-gun-violence/), June 2021
 
@@ -644,7 +646,7 @@ Yet de Blasio on Monday offered nothing in the way of new ideas to stem the crim
 
 Eric L. Adams, 2022-present
 
-*"With shootings on the rise in New York City, Mayor Eric Adams on Thursday named as his new "gun czar" the head of a taxpayer-funded "violence interrupter" nonprofit whom investigators had found used the group to line his pockets and employ his relatives. Andre Mitchell, executive director of the nonprofit Man Up Inc, will serve as volunteer co-chair of a task force addressing gun violence as part of Adams' campaign to reverse the trend of mayhem that's plagued city streets since just prior to the pandemic."*
+*"With shootings on the rise in New York City, Mayor Eric Adams on Thursday named as his new"gun czar" the head of a taxpayer-funded "violence interrupter" nonprofit whom investigators had found used the group to line his pockets and employ his relatives. Andre Mitchell, executive director of the nonprofit Man Up Inc, will serve as volunteer co-chair of a task force addressing gun violence as part of Adams' campaign to reverse the trend of mayhem that's plagued city streets since just prior to the pandemic."*
 
 \- [The City](https://www.thecity.nyc/2022/06/02/eric-adams-andre-mitchell-man-up-gun-czar/), June 2022
 
@@ -959,4 +961,4 @@ knitr::kable(
 )
 ```
 
-We see that no matter which bourough, a vast majority (almost 80%) of shootings happen in homes.
+We see that no matter which borough, a vast majority (almost 80%) of shootings happen in homes.
