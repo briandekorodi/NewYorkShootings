@@ -575,6 +575,12 @@ mayors_img <- mayors +
 print(mayors_img)
 ```
 
+Michael R. Bloomberg, 2003-2013
+
+Bill de Blasio, 2004-2021
+
+Eric L. Adams, 2022-present
+
 ### Get a good night's sleep, nothing good happens after midnight: Time of shootings
 
 Distribution of OCCUR_TIME conditioned on the boroughs :
