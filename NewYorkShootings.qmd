@@ -423,6 +423,7 @@ nonviolent_precincts <- c("5","14","66","20","18","68","123","6","1","112","19",
 ### Visualizing violent and non violent precincts over time : NYC maps
 
 ```{r}
+install.packages("sf")
 library(sf)
 
 nyc_precincts <- st_read("data/NYC_precincts/geo_export_67d4adff-9e57-4cd6-91b7-03cb65ec7fec.shp")
@@ -454,7 +455,8 @@ shootings_precincts_per_periods <- shootings_precincts_per_periods |>
 ```
 
 ```{r}
-install.packages("sf")
+
+library(sf) 
 
 ggplot() +
   geom_sf(data = shootings_precincts_per_periods, aes(geometry=geometry, fill=`Average number of shootings`)) +
