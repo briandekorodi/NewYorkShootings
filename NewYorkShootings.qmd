@@ -420,9 +420,47 @@ nonviolent_precincts <- c("5","14","66","20","18","68","123","6","1","112","19",
     labs(title="Number of shooting incidents by precinct over the years ")
 ```
 
-### Visualizing violent and non violent precincts over time : a NYC map
+### Visualizing violent and non violent precincts over time : NYC maps
 
 ```{r}
+library(sf)
+
+nyc_precincts <- st_read("data/NYC_precincts/geo_export_67d4adff-9e57-4cd6-91b7-03cb65ec7fec.shp")
+
+#nyc_boroughs <- st_read("data/NYC_boroughs/geo_export_d3400c99-9a69-4d69-825e-f2fe32c664a1.shp")
+```
+
+```{r}
+shootings_precincts_per_periods <-
+  clean_data |>
+    mutate("year"=year(OCCUR_DATE), "period"=case_when(
+      2006 <= year & year <= 2011 ~ "2006-2011",
+      2012 <= year & year <=2019 ~ "2012-2019",
+      2020 <= year & year <= 2022 ~ "2020-2022")) |>
+    group_by(PRECINCT, period) |>
+    summarise('Total number of shootings'=n()) |>
+    rename("precinct"=PRECINCT) |>
+    mutate("Average number of shootings" = case_when(
+      period == "2006-2011" ~ `Total number of shootings`/6 , 
+      period == "2012-2019" ~ `Total number of shootings`/8,
+      period == "2020-2022" ~ `Total number of shootings`/3))
+```
+
+```{r}
+# add spacial coordinates to the previous dataset
+
+shootings_precincts_years <- shootings_precincts_years |> 
+  left_join(nyc_precincts) 
+```
+
+```{r}
+ggplot() +
+  geom_sf(data = shootings_precincts_years, aes(geometry=geometry, fill=`Average number of shootings`)) +
+  facet_wrap(~ period, nrow=2) +
+  scale_fill_continuous(trans = 'reverse') +
+  labs(title = "Average number of shooting incidents per year in the different NYC precincts", subtitle = "over 3 periods of time")
+
+
 
 ```
 
