@@ -519,6 +519,14 @@ presidents_img <- presidents +
 print(presidents_img)
 ```
 
+George W. Bush, 2006-2009
+
+Barack Obama, 2009-2017
+
+Donald J. Trump, 2017-2021
+
+Joe Biden, 2021-present
+
 ### NYC shootings during Mayors' terms
 
 ```{r}
