@@ -420,19 +420,10 @@ nonviolent_precincts <- c("5","14","66","20","18","68","123","6","1","112","19",
     labs(title="Number of shooting incidents by precinct over the years ")
 ```
 
-### EXAMPLE OF CODE FOR ANIMATED MAP
+### Visualizing violent and non violent precincts over time : a NYC map
 
 ```{r}
-#facet_anim = 
-  #tm_shape(usbj_contig9311) +
-  #tm_polygons(fill = "population",
-              #fill.scale = tm_scale(values = pal, breaks = pb, label.na = FALSE)) +
-  #tm_facets(by = "year", nrow = 1, ncol = 1, free.coords = FALSE) +
-  #tm_shape(usa_union) + 
-  #tm_borders(lwd = 2) +
-  #tm_layout(legend.position = c("left", "bottom"), legend.frame = FALSE)
 
-#tmap_animation(tm = facet_anim, filename = "09-us_pop.gif", width = 900, height = 600)
 ```
 
 ### It's cold outside: Average shootings by month of the year
