@@ -470,6 +470,22 @@ ggplot() +
 
 During the period 2012-2019, the average number of shooting incidents per year decreased in the most violent precincts of the period 2006-2011 (those in darker blue). But during the Covid period (2020-2022), it started increasing again.
 
+```{r}
+nyc_nta <- st_read("nynta2010_23d/nynta2010.shp")
+```
+
+```{r}
+nyc_nta_gen <- NTA_data |> left_join(nyc_nta, join_by(NTACode)) 
+```
+
+```{r}
+
+ggplot() +
+  geom_sf(data = nyc_nta_gen, aes(geometry=geometry, fill=`DisplacementRiskIndex`)) +
+  labs(title = "Gentrification risk")
+
+```
+
 ### It's cold outside: Average shootings by month of the year
 
 ```{r}
