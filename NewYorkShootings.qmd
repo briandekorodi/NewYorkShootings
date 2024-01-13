@@ -69,27 +69,36 @@ For each observation, corresponding to a unique shooting incident, is provided i
 
 **Lon_Lat** : Geographical point, composed of latitude and longitude coordinates, of the location at which the shooting incident occurred
 
-## Loading the data
+# Packages
 
 ```{r}
 #| message: FALSE
+library(vroom)
+library(dplyr)
+library(tidyr)
+library(hms)
+library(ggplot2)
+library(tidyverse)
+library(lubridate)
+install.packages("sf")
+library(sf)
+install.packages("png")
+library(png)
+install.packages("patchwork")
+library(patchwork)
+```
+
+## Loading the data
+
+```{r}
 here::i_am("NewYorkShootings.Rproj")
 ```
 
 ```{r}
-library(vroom)
-```
-
-```{r}
-
 raw_data <- vroom("data/NYPD_Shooting_Incident_Data__Historic.csv")
 ```
 
 ## Data Cleaning
-
-```{r}
-library(dplyr)
-```
 
 We create a new dataset on which we will implement our cleaning steps.
 
@@ -216,7 +225,6 @@ We us as_hms to convert it from double to time.
 
 ```{r}
 #In case this issue arises
-library(hms)
 clean_data[["OCCUR_TIME"]] <- clean_data[["OCCUR_TIME"]] |> as_hms()
 ```
 
@@ -248,10 +256,6 @@ knitr::kable(basic_info)
 ## A first look
 
 ```{r}
-library(ggplot2)
-```
-
-```{r}
 clean_data |>
   filter(!is.na(Longitude) & !is.na(Latitude)) |>
   ggplot(aes(x=Longitude, y=Latitude, color=BORO))+
@@ -270,8 +274,6 @@ On this note, we will attempt to further deconstruct the patterns behind this re
 Before starting our analysis, it useful to produce an overview of the NA values in the dataset.
 
 ```{r}
-library(tidyverse)
-
 clean_data |>
   summarise_all(~ sum(is.na(.))/nrow(clean_data)) |>
   pivot_longer(cols = 1:21, names_to = "Variable", values_to = "proportion of NA") |>
@@ -289,8 +291,6 @@ This needs to be carefully taken into account in any further analysis involving 
 Without any grouping :
 
 ```{r}
-library(lubridate)
-
 clean_data |>
   mutate("year"=year(OCCUR_DATE)) |>
   #filter(year == 2020) |>
@@ -305,9 +305,7 @@ clearly there are too many dates...
 Grouping by year :
 
 ```{r}
-library(lubridate)
-
-  clean_data |>
+clean_data |>
   select(OCCUR_DATE) |>
   mutate('year'=year(OCCUR_DATE))|>
   group_by(year)|>
@@ -427,9 +425,6 @@ nonviolent_precincts <- c("5","14","66","20","18","68","123","6","1","112","19",
 ### Visualizing violent and non violent precincts over time : NYC maps
 
 ```{r}
-install.packages("sf")
-library(sf)
-
 nyc_precincts <- st_read("data/NYC_precincts/geo_export_67d4adff-9e57-4cd6-91b7-03cb65ec7fec.shp")
 
 #nyc_boroughs <- st_read("data/NYC_boroughs/geo_export_d3400c99-9a69-4d69-825e-f2fe32c664a1.shp")
@@ -459,9 +454,6 @@ shootings_precincts_per_periods <- shootings_precincts_per_periods |>
 ```
 
 ```{r}
-
-library(sf) 
-
 ggplot() +
   geom_sf(data = shootings_precincts_per_periods, aes(geometry=geometry, fill=`Average number of shootings`)) +
   facet_wrap(~ period, nrow=2) +
@@ -483,7 +475,6 @@ nyc_nta_gen <- NTA_data |> left_join(nyc_nta, join_by(NTACode))
 ```
 
 ```{r}
-
 ggplot() +
   geom_sf(data = nyc_nta_gen, aes(geometry=geometry, fill=`DisplacementRiskIndex`)) +
   labs(title = "Displacement risk index 2022 (Gentrification potential)")
@@ -500,8 +491,6 @@ months_association <- data.frame("month name"=c("Jan","Feb","Mar","Apr","May","J
 ```
 
 ```{r}
-library(tidyverse) 
-
 clean_data |>
   select(OCCUR_DATE) |>
   mutate('month'=month(OCCUR_DATE))|>
@@ -516,11 +505,6 @@ clean_data |>
 ### Shooting incidents in NYC during each US President's term
 
 ```{r}
-library(ggplot2)
-library(dplyr)
-library(tidyr)
-library(lubridate)
-
 presidents <- clean_data |>
   select(OCCUR_DATE) |>
   mutate('year'=year(OCCUR_DATE))|>
@@ -535,22 +519,12 @@ presidents <- clean_data |>
     geom_vline(xintercept = 2009, color = "red") +
     geom_vline(xintercept = 2017, color = "red") +
     geom_vline(xintercept = 2021, color = "red")
-  
-install.packages("png")
-library(png)
-
-here::i_am("NewYorkShootings.Rproj")
-
 
 Bush_img <- readPNG("pngimg.com - geaorge_bush_PNG16.png", native = TRUE)
 Obama_img <- readPNG("pngwing.com.png", native = TRUE)
 Trump_img <- readPNG("trump.png", native = TRUE)
 Covid_img <- readPNG("covid.png", native = TRUE)
 Biden_img <- readPNG("joe-biden-40972.png", native = TRUE)
-
-
-install.packages("patchwork")
-library(patchwork)
 
 presidents_img <- presidents +                   
   inset_element(p = Bush_img, 
@@ -593,11 +567,6 @@ Joe Biden, 2021-present
 ### NYC shootings during Mayors' terms
 
 ```{r}
-library(ggplot2)
-library(dplyr)
-library(tidyr)
-library(lubridate)
-
 mayors <- clean_data |>
   select(OCCUR_DATE) |>
   mutate('year'=year(OCCUR_DATE))|>
@@ -610,21 +579,10 @@ mayors <- clean_data |>
     labs(title="Number of shooting incidents in NYC over the years ") +
     geom_vline(xintercept = 2013, color = "red") +
     geom_vline(xintercept = 2021, color = "red")
-  
-install.packages("png")
-library(png)
-
-here::i_am("NewYorkShootings.Rproj")
-
 
 Bloomberg_img <- readPNG("Bloomberg.png", native = TRUE)
 DeBlasio_img <- readPNG("deblasio.png", native = TRUE)
 Adams_img <- readPNG("adams.png", native = TRUE)
-
-
-
-install.packages("patchwork")
-library(patchwork)
 
 mayors_img <- mayors +                   
   inset_element(p = Bloomberg_img, 
@@ -720,7 +678,6 @@ clean_data |>
   ggplot(aes(x=VIC_AGE_GROUP, fill= PERP_AGE_GROUP)) + 
   geom_bar(position="fill") +
   geom_text(aes(label=after_stat(count)), stat="count", position=position_fill(vjust=0.5))
-
 ```
 
 When not taking NA values into account :
@@ -774,7 +731,6 @@ Furthermore, all races of victims are quite likely to be shot by a black offende
 PERP_RACE conditioned on VIC_RACE and BORO
 
 ```{r}
-
 clean_data |>
   select(VIC_RACE, PERP_RACE, BORO) |> 
   filter(!is.na(VIC_RACE) & !is.na(PERP_RACE)) |>
@@ -839,7 +795,6 @@ clean_data |>
   filter(!is.na(LOCATION_DESC)) |>
   ggplot(aes(x=LOCATION_DESC)) +
   geom_bar()
-
 ```
 
 ```{r}
@@ -990,6 +945,5 @@ We see that no matter which borough, a vast majority (almost 80%) of shootings h
 ### Neighbourhood gentrification
 
 ```{r}
-here::i_am("NewYorkShootings.Rproj")
 NTA_data <- vroom("DRI_Subindices_Indicators.csv")
 ```
