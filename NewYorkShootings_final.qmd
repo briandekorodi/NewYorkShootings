@@ -1,0 +1,5 @@
+---
+title: "NewYorkShootings_final"
+author: "Brian de Korodi & Mariane Modena"
+format: pdf
+---
