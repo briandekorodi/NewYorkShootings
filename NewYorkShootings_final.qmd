@@ -436,13 +436,14 @@ You are shocked as you continue to learn about your high probability of getting 
 
 ### Is gun violence inclusive ?
 
-```{r}
+```{r plot-wider, fig.width=10, gig.height=4}
 clean_data |>
   select(VIC_RACE, PERP_RACE) |> 
   filter(!is.na(VIC_RACE) & !is.na(PERP_RACE)) |>
   ggplot(aes(x=VIC_RACE, fill=PERP_RACE)) + 
   geom_bar(position="fill") +
-  labs(title="Perp race conditional on victim race", y="Victim race")
+  scale_x_discrete(labels = label_wrap_gen(10)) +
+  labs(title="Perp race conditional on victim race", y="Victim race") 
 ```
 
 According to the research, there seems to be a link between the races of victims and offenders. A victim of a given race is more likely to be shot by someone of that same race than a victim of any another race. For example, a white victim is more likely to get shot by a white offender than a black or a white Hispanic victim. This observation isn't true for American Indian/Alaskan native victims, but the number of shootings involving them is also small (only 4 observations).
