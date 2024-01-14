@@ -65,8 +65,6 @@ For each observation, corresponding to a unique shooting incident, is provided i
 
 **Lon_Lat** : Geographical point, composed of latitude and longitude coordinates, of the location at which the shooting incident occurred
 
-## Loading the data
-
 ```{r}
 #| message: FALSE
 #| warning: FALSE
@@ -679,7 +677,7 @@ shootings_precincts_per_periods <-
 ```
 
 ```{r}
-#| message : FALSE
+#| message=FALSE
 shootings_precincts_per_periods <- shootings_precincts_per_periods |> 
   left_join(nyc_precincts) 
 ```
