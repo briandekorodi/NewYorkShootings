@@ -1,5 +1,5 @@
 ---
-title: "NewYorkShootings_final"
+title: "NewYorkShootings"
 author: "Brian de Korodi & Mariane Modena"
 format: pdf
 echo: false
@@ -797,3 +797,15 @@ Next, the city-wide trends in number of shooting incidents were put forward. Put
 One possible explanation for the decrease in shooting among the most violent areas might be gentrification. This might be a clue for the East Queens area, however the other two most violent zones in the city still show precariously high risk displacement indexes today. This might indicate that they are safer not because of economic development, but because of policy, in particular the mayors' attempts to control the flow of illegal firearms into the city.
 
 Having learned about the recent history and sociodemographic patterns of New York City's shooting incidents, and of the effectiveness of illegal firearms control policies, you are more determined than ever to become the next great mayor of the City of Bright Lights.
+
+## Annex
+
+[GitHub repository](https://github.com/briandekorodi/NewYorkShootings)
+
+### Data import work :
+
+The main data set, which is an historic of all shooting incidents that happened in NYC between 2006 and 2022, is from [the US government open data website](https://catalog.data.gov/dataset/nypd-shooting-incident-data-historic/resource/c564b578-fd8a-4005-8365-34150d306cc4).
+
+To display the shooting incidents on the map of NYC, it was joined with a [shape file of NYC precincts](https://data.cityofnewyork.us/Public-Safety/Police-Precincts/78dh-3ptz), using the common column "precinct".
+
+To produce the map of the Displacement Risk Index in NYC (2022), data from the [Displacement Risk Map of NYC](https://equitableexplorer.planning.nyc.gov/map/drm/nta) was used.
