@@ -237,10 +237,9 @@ clean_data[["OCCUR_DATE"]] <- clean_data[["OCCUR_DATE"]] |> as.Date(format="%m/%
 
 ## Basic information about the data file
 
-```{r}
+```{r fig.width=10, fig.height=5}
 basic_info <- clean_data |>
-  reframe("Name of the file" = gsub(".csv","", list.files("data", pattern=".csv")),
-            "File content" = "Reported shooting incidents in New York City",
+  reframe("File content" = "Reported shooting incidents in New York City",
             "Number of observations" = nrow(clean_data),
             "Number of variables" = ncol(clean_data),
             "Date of first observation" = last(OCCUR_DATE),
@@ -249,8 +248,9 @@ basic_info <- clean_data |>
             "Number of character variables" = length(select_if(clean_data,is.character)),
             "Number of logical variables" = length(select_if(clean_data,is.logical)),
             "Number of time variables" = length(select_if(clean_data,is_hms)),
-            "Proportion of missing values" = (sum(is.na(clean_data)))/((nrow(clean_data))*(ncol(clean_data))))
-knitr::kable(basic_info)
+            "Proportion of missing values" = round((sum(is.na(clean_data)))/((nrow(clean_data))*(ncol(clean_data))),2)
+          )
+knitr::kable(basic_info, caption="NYPD_Shooting_Incident_Data__Historic.csv")
 
 ```
 
@@ -436,7 +436,7 @@ You are shocked as you continue to learn about your high probability of getting 
 
 ### Is gun violence inclusive ?
 
-```{r plot-wider, fig.width=10, gig.height=4}
+```{r plot-wider, fig.width=10, fig.height=4}
 clean_data |>
   select(VIC_RACE, PERP_RACE) |> 
   filter(!is.na(VIC_RACE) & !is.na(PERP_RACE)) |>
@@ -691,7 +691,7 @@ shootings_precincts_per_periods <- shootings_precincts_per_periods |>
   left_join(nyc_precincts) 
 ```
 
-```{r}
+```{r fig.width=10, fig.height=5}
 ggplot() +
   geom_sf(data = shootings_precincts_per_periods, aes(geometry=geometry, fill=`count`)) +
   facet_wrap(~ period, nrow=1) +
