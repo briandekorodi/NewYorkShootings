@@ -2,4 +2,787 @@
 title: "NewYorkShootings_final"
 author: "Brian de Korodi & Mariane Modena"
 format: pdf
+echo: false
 ---
+
+# Gun violence in the Big Apple: How shooting incidents help to tell the story of New York City over the last 16 years.
+
+A city of bright lights and big dreams, New York's history is also one of crime, violence and social inequality. This is why we will attempt to tell the story of New York City through the lens of its shooting incidents.
+
+Through geographical, sociodemographic and temporal aspects of reported shooting incidents in New York City, we attempt to find relevant trends that might align with social and economic developments between 2006 and 2022.
+
+We have found certified data with detailed descriptive characteristics of all reported shooting incidents, including date, time, location, victim and offender's characteristics. This will allow us to summarize the quantity of shooting incidents as a function of these characteristics, along with their evolution over the given timeframe. Where significant patterns reveal themselves, we will attempt to use external information to help explain these patterns in light of various contextual factors, such as political, social, or economic evolutions. 
+
+This method, combining descriptive data with contextual information, we hope, will allow us to determine to what extent gun violence incidents are random events, or whether they may be partially explained by larger social and economic forces.
+
+## Click [here](https://github.com/briandekorodi/NewYorkShootings) to access the Github repository
+
+## Click [here](https://catalog.data.gov/dataset/nypd-shooting-incident-data-historic/resource/c564b578-fd8a-4005-8365-34150d306cc4) to access the source
+
+## Description of the source
+
+The data, found in the official United States open data website, constitutes a list of every New York City shooting incident, reported by the NYPD, from January 1, 2006 to Decemeber 31, 2022. This data is manually extracted every quarter and reviewed by the Office of Management Analysis and Planning before being posted on the NYPD website.
+
+For each observation, corresponding to a unique shooting incident, is provided information relative to the date, time and localisation of the incident, as well as socio-demographic characteristics of the offender and victim.
+
+## Description of the variables
+
+**INCIDENT_KEY** : Serial number identifying the incident
+
+**OCCUR_DATE** : Date (Month/Day/Year) on which the incident occurred
+
+**OCCUR_TIME** : Time at which the incident occured
+
+**BORO** : Which of the 5 New York City boroughs the incident occurred in (Manhattan, Queens, Brooklyn, Bronx, Staten Island)
+
+**LOC_OF_OCCUR_DESC** : Most general category of location, whether the incident occurred inside ,outside, or unknown
+
+**PRECINCT** : Code identifying which NYPD precinct in which the incident occurred
+
+**JURISDICTION_CODE** : Code identifying the tax jurisdiction territory in which the incident occurred
+
+**LOC_CLASSFCTN_DESC** : Second most general category of location
+
+**LOCATION_DESC** : Third most general category of location
+
+**STATISTICAL_MURDER_FLAG** : TRUE/FALSE variable indicating whether the shooting resulted in a murder
+
+**PERP_AGE_GROUP** : Age range of the offender
+
+**PERP_SEX** : Sex of the offender
+
+**PERP_RACE** : Racial group of the offender
+
+**VIC_AGE_GROUP** : Age range of the victim
+
+**VIC_SEX** : Sex of the victim
+
+**VIC_RACE** : Racial group of the victim
+
+**X_COORD_CD** : Cartesian X coordinate of the location at which the shooting incident occurred
+
+**Y_COORD_CD** : Cartesian Y coordinate of the location at which the shooting incident occurred
+
+**Latitude** : Geographical latitude coordinate of the location at which the shooting incident occurred
+
+**Longitude** : Geographical longitude coordinate of the location at which the shooting incident occurred
+
+**Lon_Lat** : Geographical point, composed of latitude and longitude coordinates, of the location at which the shooting incident occurred
+
+## Loading the data
+
+```{r}
+#| message: FALSE
+#| warning: FALSE
+library(vroom)
+library(dplyr)
+library(tidyr)
+library(hms)
+library(ggplot2)
+library(tidyverse)
+library(lubridate)
+#install.packages("sf")
+library(sf)
+#install.packages("png")
+library(png)
+#install.packages("patchwork")
+library(patchwork)
+```
+
+```{r}
+#| message: FALSE
+here::i_am("NewYorkShootings.Rproj")
+```
+
+```{r}
+#| message: FALSE
+raw_data <- vroom("data/NYPD_Shooting_Incident_Data__Historic.csv")
+```
+
+## Data Cleaning
+
+We create a new dataset on which we will implement our cleaning steps.
+
+```{r}
+clean_data <- raw_data
+```
+
+### Inconsistent labeling of missing values
+
+The dataset contains some inconsistencies in the entry of missing values. Some missing values are labeled NA, while others are labeled with some other character value, such as "(null)", "UNKNOWN", "U", or "OTHER". We convert all of these to NA.
+
+#### Null
+
+The location description and offender age group variables contain missing values that have the notation "(null)".
+
+```{r}
+knitr::kable(clean_data |> distinct(LOCATION_DESC))
+```
+
+```{r}
+knitr::kable(clean_data |> distinct(PERP_AGE_GROUP))
+```
+
+We replace all the "(null)" values in the dataset by NA.
+
+```{r}
+clean_data[clean_data == "(null)"] <- NA
+```
+
+#### NONE
+
+The location description variable contains some missing values labeled as NONE. We replace these by NA.
+
+```{r}
+clean_data[clean_data == "NONE"] <- NA
+```
+
+#### UNKNOWN
+
+The victim age group variable contains some missing values labeled as UNKNOWN. We replace these by NA.
+
+```{r}
+knitr::kable(clean_data |> distinct(VIC_AGE_GROUP))
+```
+
+```{r}
+knitr::kable(clean_data |> distinct(PERP_AGE_GROUP))
+```
+
+```{r}
+clean_data[clean_data == "UNKNOWN"] <- NA
+```
+
+#### OTHER
+
+The location classification variable contains some missing values labeled as OTHER. We replace these by NA.
+
+```{r}
+knitr::kable(clean_data |> distinct(LOC_CLASSFCTN_DESC))
+```
+
+```{r}
+clean_data[clean_data == "OTHER"] <- NA
+```
+
+#### U
+
+The victim and offender sex variables contain some missing values labeled as U. We replace these by NA.
+
+```{r}
+knitr::kable(clean_data |> distinct(PERP_SEX))
+```
+
+```{r}
+knitr::kable(clean_data |> distinct(VIC_SEX))
+```
+
+```{r}
+clean_data[clean_data == "U"] <- NA
+```
+
+### Impossible values
+
+The victim and offender age group variables contain some absurd values. It is impossible that the victim's age be 1022, or that the offender's age be 1020, 940 or 224. We replace these values by NA.
+
+```{r}
+knitr::kable(clean_data |> distinct(VIC_AGE_GROUP))
+```
+
+```{r}
+knitr::kable(clean_data |> distinct(PERP_AGE_GROUP))
+```
+
+```{r}
+clean_data <- clean_data |>
+  mutate(VIC_AGE_GROUP = ifelse(!VIC_AGE_GROUP %in% c("<18", "18-24", "25-44", "45-64", "65+"), NA, VIC_AGE_GROUP),
+         PERP_AGE_GROUP = ifelse(!PERP_AGE_GROUP %in% c("<18", "18-24", "25-44", "45-64", "65+"), NA, PERP_AGE_GROUP))
+```
+
+### Typos
+
+The location description variable contains some values with typos. We correct these.
+
+```{r}
+knitr::kable(clean_data |> distinct(LOCATION_DESC))
+```
+
+```{r}
+clean_data <- clean_data |>
+  mutate(LOCATION_DESC = recode(LOCATION_DESC, "MULTI DWELL - PUBLIC HOUS" =  "MULTI DWELL - PUBLIC HOUSE", 
+                                "SOCIAL CLUB/POLICY LOCATI" = "SOCIAL CLUB/POLICY LOCATION"))
+```
+
+### Wrong types
+
+Depending on the computer, te variable OCCUR_TIME may have a double type, which means its values take on a "... secs" format, rather than a "hours/minutes/seconds" format. This not very readable.
+
+```{r}
+#In case this issue arises
+#clean_data[["OCCUR_TIME"]] |> typeof()
+```
+
+We us as_hms to convert it from double to time.
+
+```{r}
+#In case this issue arises
+clean_data[["OCCUR_TIME"]] <- clean_data[["OCCUR_TIME"]] |> as_hms()
+```
+
+we change the type of OCCUR_DATE from character to date.
+
+```{r}
+clean_data[["OCCUR_DATE"]] <- clean_data[["OCCUR_DATE"]] |> as.Date(format="%m/%d/%Y")
+```
+
+## Basic information about the data file
+
+```{r}
+basic_info <- clean_data |>
+  reframe("Name of the file" = gsub(".csv","", list.files("data", pattern=".csv")),
+            "File content" = "Reported shooting incidents in New York City",
+            "Number of observations" = nrow(clean_data),
+            "Number of variables" = ncol(clean_data),
+            "Date of first observation" = last(OCCUR_DATE),
+            "Date of last observation" = first(OCCUR_DATE),
+            "Number of numerical variables" = length(select_if(clean_data,is.numeric)),
+            "Number of character variables" = length(select_if(clean_data,is.character)),
+            "Number of logical variables" = length(select_if(clean_data,is.logical)),
+            "Number of time variables" = length(select_if(clean_data,is_hms)),
+            "Proportion of missing values" = (sum(is.na(clean_data)))/((nrow(clean_data))*(ncol(clean_data))))
+knitr::kable(basic_info)
+
+```
+
+## NA values
+
+Before starting our analysis, it useful to produce an overview of the NA values in the dataset.
+
+```{r}
+clean_data |>
+  summarise_all(~ sum(is.na(.))/nrow(clean_data)) |>
+  pivot_longer(cols = 1:21, names_to = "Variable", values_to = "proportion of NA") |>
+  ggplot(aes(y=Variable, x=`proportion of NA`)) +
+  geom_col() +
+  labs(title="Proportion of NA values per variable")
+```
+
+The variables related to shooting locations and offender characteristics (age, sex, race) clearly contain high proportions of NA values whereas most of the other variables don't have any.
+
+This needs to be carefully taken into account in any further analysis involving those variables, as the results that will be obtained might not completely reflect the values of the entire sample, especially for the location variables that have more than 50% of missing values.
+
+For the PERP variables, it is unfortunate albeit expected, that almost half of the values are missing but we use them anyway since they comprise very relevant information.
+
+We will dispense from using LOC_OF_OCCUR_DESC and LOC_CLASSFCTN_DESC as almost all of their values are missing. This is not a big loss in any case; since these two variables do not provide specific information. LOCATION_DESC has only 50% missing values and would provide us with more useful insights into the locations of shooting incidents. However, we believe that this variable is biased and therefore not appropriate for our analysis. Our reasoning is the following: the graph below shows that almost all the incidents with a specified location are categorized as happening in a home.
+
+```{r}
+clean_data |>
+  mutate(LOCATION_DESC = recode(LOCATION_DESC, "MULTI DWELL - PUBLIC HOUSE" =  "Home",
+                                "MULTI DWELL - APT BUILD" = "Home",
+                                "PVT HOUSE" = "Home",
+                                "SMALL MERCHANT" = "Commerce",
+                                "HOTEL/MOTEL" = "Hotel",
+                                "HOSPITAL" = "Hospital",
+                                "BAR/NIGHT CLUB" = "Night life",
+                                "BEAUTY/NAIL SALON" = "Commerce",
+                                "STORE UNCLASSIFIED" = "Store",
+                                "RESTAURANT/DINER" = "Restaurant",
+                                "GROCERY/BODEGA" = "Store",
+                                "SOCIAL CLUB/POLICY LOCATION" = "Misc",
+                                "JEWELRY STORE" = "Store",
+                                "COMMERCIAL BLDG" = "Commerce",
+                                "SUPERMARKET" = "Store",
+                                "DRY CLEANER/LAUNDRY" = "Commerce",
+                                "GAS STATION" = "Commerce",
+                                "LIQUOR STORE" = "Store",
+                                "CLOTHING BOUTIQUE" = "Store",
+                                "FACTORY/WAREHOUSE" = "Commerce",
+                                "FAST FOOD" = "Store",
+                                "DRUG STORE" = "Store",				
+                                "CHECK CASH" = "Finance",				
+                                "VARIETY STORE" = "Store",				
+                                "BANK" = "Finance",				
+                                "ATM" = "Finance",				
+                                "CANDY STORE" = "Store",			
+                                "VIDEO STORE" = "Store",				
+                                "SHOE STORE" = "Store",
+                                "PHOTO/COPY STORE" = "Store",				
+                                "DEPT STORE" = "Store",				
+                                "GYM/FITNESS FACILITY" = "Commerce",				
+                                "CHAIN STORE" = "Store",				
+                                "DOCTOR/DENTIST" = "Commerce",				
+                                "TELECOMM. STORE" = "Store",				
+                                "LOAN COMPANY" = "Commerce",				
+                                "SCHOOL" = "School",				
+                                "STORAGE FACILITY" = "Misc")) |>
+  filter(!is.na(LOCATION_DESC)) |>
+  ggplot(aes(x=LOCATION_DESC)) +
+  geom_bar()+
+  labs(title="Distribution of shooting locations", subtitle = "2006-2022",x="Shooting locations")
+  
+```
+
+This does not seem realistic, and we assume that this is due to the manual data typing process. Since it is more difficult to know the precise location of a shooting that does not take place in a home, the NA values will naturally be comprised mostly of locations other than "Home", while the shootings that do happen in a home are much more likely to have a non-NA value. Therefore, we believe that this variable is too biased to be used for analysis.
+
+## A first look
+
+```{r}
+clean_data |>
+  filter(!is.na(Longitude) & !is.na(Latitude)) |>
+  ggplot(aes(x=Longitude, y=Latitude, color=BORO))+
+  geom_point() +
+  labs(title = "Locations of shooting incidents in New York City", subtitle="2006-2022")
+```
+
+![*Map of New York City*](NYC_Map.png){fig-align="center" width="554" height="455"}
+
+Nothing illustrates the tight link between New York City and its history of gun violence quite like the near reproduction of the city map simply by plotting all shooting incidents according to their geographical coordinates.
+
+On this note, we will attempt to further deconstruct the patterns behind this remarkable data.
+
+## A night out in New York City : typical features of violent encounters
+
+Freshly arrived in the Big Apple to make your biggest dreams come true, you decide to step out for an evening stroll to feel the famous New York energy. You have heard that the streets of New York can be dangerous, and want to take the necessary precautions so as to live to see another day. You come across two good looking young data scientists and decide to ask if they can tell you anything about do's and don'ts in the city to avoid being caught in a gun fight. It's your lucky day : they are two Dauphine students who happen to be experts on the subject. They give you a breakdown, backed by rigorous statistical researched, of the main features of NYC gun violence over the last decade and a half.
+
+### Get a good night's sleep, nothing good happens when you skip your bedtime: Time distribution of shootings
+
+```{r}
+clean_data |>
+  #select(OCCUR_TIME) |>
+  mutate("hour"=hour(OCCUR_TIME)) |>
+  ggplot(aes(x=hour)) +
+  geom_bar()+
+  #facet_wrap(~BORO, nrow=4)+
+  labs(title="Distribution of time of shootings in NYC", subtitle="2006-2022")
+```
+
+The first mistake seems to have been to go outside in the first place. But wait a minute... you settled in a seemingly nice neighborhood, so you should be safe, right ?
+
+```{r}
+clean_data |>
+  #select(OCCUR_TIME) |>
+  mutate("hour"=hour(OCCUR_TIME)) |>
+  ggplot(aes(x=hour)) +
+  geom_bar()+
+  facet_wrap(~BORO, nrow=4)+
+  labs(title="Distribution of time of shootings in NYC by borough", subtitle="2006-2022")
+```
+
+Actually, no. According to your new expert friends, no matter the neighbourhood, the way to maximize your chances of finishing as the victim in the latest episode of CSI is to go out between 8 pm and 5 am.
+
+Especially during the warm months :
+
+```{r}
+months_association <- data.frame("month name"=c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"), "month"=c(1,2,3,4,5,6,7,8,9,10,11,12)
+)
+```
+
+```{r}
+clean_data |>
+  select(OCCUR_DATE) |>
+  mutate('month'=month(OCCUR_DATE))|>
+  group_by(month)|>
+  summarise('Average number of shooting incidents'= n()/16) |>
+  left_join(months_association, join_by("month")) |>
+  ggplot(aes(x=fct_inorder(month.name), y=`Average number of shooting incidents`)) +
+  geom_col() +
+  labs(x="Month", title="Average number of shooting incidents by month in NYC", subtitle="over the period 2006-2022")
+```
+
+### Crime is a men's game
+
+More bad news for you, you are a man, which means you are almost 4 times more likely to get shot by a woman and around 8 times more likely to get shot by man, compared to your female counterparts.
+
+```{r}
+clean_data |>
+  select(VIC_SEX, PERP_SEX) |> 
+  filter(!is.na(VIC_SEX) & !is.na(PERP_SEX)) |>
+  ggplot(aes(x=PERP_SEX, fill=VIC_SEX)) + 
+  geom_bar(position="fill") +
+  geom_text(stat="count",aes(label=after_stat(count)), position=position_fill(vjust=0.5)) +
+  labs(title="Sex of victims conditional on the sex of offenders")
+```
+
+You start to get a bit nervous. Still only 24 and soon to turn 25, with many dreams yet unfulfilled, you are eager to launch your acting career, find the love of your life and the car of your dreams. Unfortunately for you, your youth may turn against you sooner than you think.
+
+### Age groups
+
+```{r}
+clean_data |>
+  filter(!is.na(VIC_AGE_GROUP)) |>
+  ggplot(aes(x=VIC_AGE_GROUP)) +
+  geom_bar() +
+  labs(title="Number of shooting incidents by victim age group", subtitle="2006-2022", x="victim age")
+  
+```
+
+In fact, during the last 16 years in NYC, a vast majority of gun violence victims were between 18 and 44.
+
+You feel your palms start to get sweaty, and you start reconsidering if your move to the City of Dreams was such a good idea after all. At least you can reach out to some old friends from high school, they might protect you...
+
+Or might they actually be the ones to hurt you? You are informed that shooting offenders in New York City are very likely to be in your age group. This problem is also not likely to go away as you age:
+
+```{r}
+clean_data |>
+  select(VIC_AGE_GROUP, PERP_AGE_GROUP) |> 
+  filter(!is.na(VIC_AGE_GROUP) & !is.na(PERP_AGE_GROUP)) |>
+  ggplot(aes(x=VIC_AGE_GROUP, fill= PERP_AGE_GROUP)) + 
+  geom_bar(position="fill") +
+  scale_y_reverse() +
+  labs(title="Perp age conditional on victim age", x="Victim age")
+```
+
+You are shocked as you continue to learn about your high probability of getting shot as you stroll around your neighborhood. You ask your new friends about the patterns within and across ethnic groups.
+
+### Is gun violence inclusive ?
+
+```{r}
+clean_data |>
+  select(VIC_RACE, PERP_RACE) |> 
+  filter(!is.na(VIC_RACE) & !is.na(PERP_RACE)) |>
+  ggplot(aes(x=VIC_RACE, fill=PERP_RACE)) + 
+  geom_bar(position="fill") +
+  labs(title="Perp race conditional on victim race", y="Victim race")
+```
+
+According to the research, there seems to be a link between the races of victims and offenders. A victim of a given race is more likely to be shot by someone of that same race than a victim of any another race. For example, a white victim is more likely to get shot by a white offender than a black or a white Hispanic victim. This observation isn't true for American Indian/Alaskan native victims, but the number of shootings involving them is also small (only 4 observations).
+
+```{r}
+#| message=FALSE
+knitr::kable(
+  clean_data |>
+  select(VIC_RACE, PERP_RACE) |> 
+  filter(!is.na(VIC_RACE) & !is.na(PERP_RACE) & VIC_RACE == "AMERICAN INDIAN/ALASKAN NATIVE") |>
+  group_by(VIC_RACE, PERP_RACE) |>
+  summarise('Number of Shootings'=n())
+)
+```
+
+Your data scientist friends have even performed a chi2 test on the data to confirm that the races of victims and offenders are not independent variables. To perform the test, they had to remove American Indian/Alaskan natives and Asian/Pacific Islanders because those races are associated with very small numbers of observations and may compromise the result of the test.
+
+```{r}
+#| message=FALSE
+races <-
+  clean_data |>
+  select(VIC_RACE, PERP_RACE) |>
+  filter(!is.na(PERP_RACE)) |>
+  filter(!is.na(VIC_RACE)) |>
+  filter(VIC_RACE %in% c("BLACK","BLACK HISPANIC","WHITE","WHITE HISPANIC")) |>
+  filter(PERP_RACE %in% c("BLACK","BLACK HISPANIC","WHITE","WHITE HISPANIC")) |>
+  group_by(VIC_RACE, PERP_RACE) |>
+  summarise("n"=n()) |>
+  pivot_wider(names_from = PERP_RACE, values_from = n)
+
+  races[is.na(races)] <- 0
+  
+  knitr::kable(races)
+  
+  races <- races |> 
+    subset(select=c("BLACK","BLACK HISPANIC","WHITE","WHITE HISPANIC"))
+  
+ 
+  
+```
+
+```{r}
+races <- races |> 
+  subset(select=c("BLACK","BLACK HISPANIC","WHITE","WHITE HISPANIC"))
+ 
+chisq.test(races)
+```
+
+The p-value obtained is very close to 0, which indicates that the races of offenders and victims are not independent.
+
+Realizing that you are not safe, even among your own, you start to fear for your life. Your only hope is that New Yorkers do not aim well...
+
+```{r}
+clean_data |>
+  mutate("STATISTICAL_MURDER_FLAG" = if_else(STATISTICAL_MURDER_FLAG == TRUE, 'Yes', 'No')) |>
+  group_by(STATISTICAL_MURDER_FLAG) |>
+  summarize("pct"=n()/nrow(clean_data)) |>
+  ggplot(aes(x=STATISTICAL_MURDER_FLAG, y=pct))+
+  geom_col() +
+  labs(title="Proportion of shootings resulting in a murder", subtitle="2006-2022", x="Murder")
+  
+```
+
+Fortunately for you, over the last 16 years, 80% of shootings in NYC did not lead to murders.
+
+## Demographics aside, what is the city-wide trend ?
+
+After fearing for your life, you realize that there are large issues of gun violence in NYC. You decide to ditch your acting career to instead become NYC's next mayor and make the city a safer place. The first step is to gather information about the city's history of gun violence. You invite your new friends from Dauphine out for a drink so they can tell you more about it.
+
+```{r}
+clean_data |>
+  select(OCCUR_DATE) |>
+  mutate('year'=year(OCCUR_DATE))|>
+  group_by(year)|>
+  summarise('Number of shootings'= n()) |>
+  ggplot(aes(x=year, y=`Number of shootings`)) +
+    geom_line() + 
+    geom_point() +
+    scale_x_continuous(breaks=c(seq(2006,2022,by=1))) +
+    labs(title="Number of shooting incidents in NYC over the years", subtitle="2006-2022")
+```
+
+The city seems to be almost just as dangerous today as it was a decade and a half ago. Is New York City doomed?
+
+But your new friends give you some hope. "Indeed", they tell you, "shootings have risen back to close to 2006 levels in the past two years, but this recent trend is almost certainly an anomalous shock due to the Covid-19 pandemic. The good news is that between 2006 and 2019, the volume of shooting incidents dropped drastically. This indicates that the efforts to make the city safer were on the right track until before the pandemic. Let's study that time period in more detail."
+
+Finally some good news, you tell yourself. You ask if this decrease has occurred homogeneously across the whole city, or if it is influenced by particular areas.
+
+### The Great Decrease in gun violence
+
+```{r}
+#| message=FALSE
+ clean_data |>
+  select(OCCUR_DATE, BORO) |>
+  mutate('year'=year(OCCUR_DATE))|>
+  filter(year <= 2019) |>
+  group_by(year, BORO)|>
+  summarise('Number of shootings'= n()) |>
+  ggplot(aes(x=year, y=`Number of shootings`, group=BORO, color=BORO)) +
+    geom_line() + 
+    geom_point() +
+    scale_x_continuous(breaks=c(seq(2006,2022,by=2))) +
+    labs(title="Number of shooting incidents by boroughs over the years",subtitle = "2006-2019")
+```
+
+You learn that the drop in overall gun violence is mainly due to the the most violent boroughs, Brooklyn and the Bronx, becoming much safer. Indeed, the other boroughs have not seen as significant a change in their volume of shooting incidents. This is undoubtedly an indication that the city became much safer, especially considering that the population grew during that time span.
+
+You now understand that gun violence is not equally distributed across boroughs and that it is the most dangerous boroughs that have the most potential for improvement. But what about within boroughs ? Brooklyn and the Bronx are huge, some places must be safer than others. A good question, that your Dauphine friends are able to answer, with a more detailed breakdown of the number of shooting incidents.
+
+*"Gun violence remains a pervasive issue in small pockets of neighborhoods around New York City. The data shows that a limited number of communities have accounted for roughly 50% of NYC's shooting incidents."*
+
+[NYC Mayor's Office of Criminal Justice](https://criminaljustice.cityofnewyork.us/programs/office-to-prevent-gun-violence/)
+
+```{r}
+knitr::kable(clean_data |>
+    group_by(PRECINCT) |>
+    mutate("year"=year(OCCUR_DATE)) |>
+    filter(year <= 2019) |>
+    summarise('Number of shootings' = n()) |>
+    mutate('pct' = round((100*(prop.table(`Number of shootings`))), 2)) |>
+    arrange(desc(`pct`))
+)
+```
+
+The table confirms the above statement: out of a total of 77 police precincts in New York City, there is a group of 14 that account for over 50% of the total shooting incidents from 2006 - 2019.
+
+You have learned that the boroughs that were more violent in 2006 saw the largest drops in gun violence over the following 13 years. This phenomenon is also visible within boroughs, by looking at changes in shooting incidents at the precinct level.
+
+Based on the above table, the Dauphine experts split the precincts into 4 groups to observe the change in gun violence from 2006 to 2019, conditional on the initial level of gun violence in 2006.
+
+```{r}
+violent_precincts <- c("75", "73", "67", "79", "44", "47", "46", "40", "81", "113", "42", "77", "43", "48", "120", "71", "32", "103", "52")
+
+mid_upper_violent_precincts <- c("83", "41", "101", "70", "105", "23", "69", "25", "60", "114", "49", "90", "28", "88", "63", "34", "33", "30", "106")
+
+mid_lower_violent_precincts <- c("102", "45", "100", "115", "76", "61", "26", "50", "110", "84", "109", "9", "24", "72", "104", "7", "107", "121", "94")
+
+nonviolent_precincts <- c("62", "10", "122", "13", "78", "5","108","66","14","20","68","123","6","18","1","112","19","17","111")
+
+```
+
+For the most violent precincts:
+
+```{r warning=FALSE}
+#| message=FALSE
+clean_data |>
+  select(OCCUR_DATE, PRECINCT, BORO) |>
+  filter(PRECINCT %in% violent_precincts) |>
+  mutate('year'=year(OCCUR_DATE))|>
+  filter(`year` < 2020) |>
+  group_by(year, PRECINCT, BORO)|>
+  summarise('Number of shootings'= n()) |>
+  ggplot(aes(x=year, y=`Number of shootings`, group=PRECINCT, color=BORO)) +
+    geom_line() + 
+    geom_point() +
+    geom_smooth(aes(group = 1), method = "lm", formula = y ~ x) +
+    scale_x_continuous(breaks=c(seq(2006,2022,by=2))) +
+    labs(title="Number of shooting incidents by precinct over the years", subtitle="Violent tier, 2006-2019")
+```
+
+Notice that none of the 14 most violent NYC police precincts belong to Manhattan or Staten Island. These precincts saw a significant drop in shooting incidents overall (about 50%), that took off in 2011.
+
+```{r warning=FALSE}
+#| message=FALSE
+clean_data |>
+  select(OCCUR_DATE, PRECINCT, BORO) |>
+  filter(PRECINCT %in% mid_upper_violent_precincts) |>
+  mutate('year'=year(OCCUR_DATE))|>
+  filter(`year` < 2020) |>
+  group_by(year, PRECINCT, BORO)|>
+  summarise('Number of shootings'= n()) |>
+  ggplot(aes(x=year, y=`Number of shootings`, group=PRECINCT, color = BORO)) +
+    geom_line() + 
+    geom_point() +
+    geom_smooth(aes(group = 1), method = "lm", formula = y ~ x) +
+    scale_x_continuous(breaks=c(seq(2006,2022,by=2))) +
+    labs(title="Number of shooting incidents by precinct over the years", subtitle="Upper middle tier, 2006-2019")
+```
+
+```{r warning=FALSE}
+#| message=FALSE
+clean_data |>
+  select(OCCUR_DATE, PRECINCT, BORO) |>
+  filter(PRECINCT %in% mid_lower_violent_precincts) |>
+  mutate('year'=year(OCCUR_DATE))|>
+   filter(`year` < 2020) |>
+  group_by(year, PRECINCT, BORO)|>
+  summarise('Number of shootings'= n()) |>
+  ggplot(aes(x=year, y=`Number of shootings`, group=PRECINCT, color = BORO)) +
+    geom_line() + 
+    geom_point() +
+    geom_smooth(aes(group = 1), method = "lm", formula = y ~ x) +
+    scale_x_continuous(breaks=c(seq(2006,2022,by=2))) +
+    labs(title="Number of shooting incidents by precinct over the years", subtitle="Lower middle tier, 2006-2019")
+```
+
+```{r warning=FALSE}
+#| message=FALSE
+clean_data |>
+  select(OCCUR_DATE, PRECINCT, BORO) |>
+  filter(PRECINCT %in% nonviolent_precincts) |>
+  mutate('year'=year(OCCUR_DATE))|>
+  filter(`year` < 2020) |>
+  group_by(year, PRECINCT, BORO)|>
+  summarise('Number of shootings'= n()) |>
+  ggplot(aes(x=year, y=`Number of shootings`, group=PRECINCT, color = BORO)) +
+    geom_line() + 
+    geom_point() +
+    geom_smooth(aes(group = 1), method = "lm", formula = y ~ x) +
+    scale_x_continuous(breaks=c(seq(2006,2022,by=2))) +
+    labs(title="Number of shooting incidents by precinct over the years", subtitle="Least violent tier, 2006-2019")
+```
+
+While all groups saw a significant decrease in shootings over the given time span, the decreases in the two most violent groups account for most of the overall city-wide change.
+
+It also seems that most in-group outliers have disappeared. The difference in violence between precincts has strongly diminished. The absolute most violent single precincts in New York City became much safer. This evolution can be visualized with the use of a map:
+
+```{r include=FALSE}
+#| message=FALSE
+nyc_precincts <- st_read("data/NYC_precincts/geo_export_67d4adff-9e57-4cd6-91b7-03cb65ec7fec.shp")
+
+#nyc_boroughs <- st_read("data/NYC_boroughs/geo_export_d3400c99-9a69-4d69-825e-f2fe32c664a1.shp")
+```
+
+```{r}
+#| message=FALSE
+shootings_precincts_per_periods <-
+  clean_data |>
+  mutate("year"=year(OCCUR_DATE)) |>
+  filter(year <= 2019) |>
+    mutate("period"=case_when(
+      2006 <= year & year <= 2011 ~ "2006-2011",
+      2012 <= year & year <=2019 ~ "2012-2019")) |>
+    group_by(PRECINCT, period) |>
+    summarise('Total number of shootings'=n()) |>
+    rename("precinct"=PRECINCT) |>
+    mutate("count" = case_when(
+      period == "2006-2011" ~ `Total number of shootings`/6 , 
+      period == "2012-2019" ~ `Total number of shootings`/8))
+```
+
+```{r}
+#| message : FALSE
+shootings_precincts_per_periods <- shootings_precincts_per_periods |> 
+  left_join(nyc_precincts) 
+```
+
+```{r}
+ggplot() +
+  geom_sf(data = shootings_precincts_per_periods, aes(geometry=geometry, fill=`count`)) +
+  facet_wrap(~ period, nrow=1) +
+  scale_fill_continuous(trans = 'reverse') +
+  labs(title = "Average number of shooting incidents per year in the different NYC precincts", subtitle = "over 2 periods of time")
+```
+
+We can identify three primary areas in which shootings incidents have decreased : south east Brooklyn, east Queens and the Bronx. This map reinforces the fact that the city's gun violence is concentrated in a limited of precincts and it the decrease in violence in these specific areas that are the largest contributors to the overall change.
+
+### Possible explanations
+
+This trend fascinates you and reassures you in your decision to become the city's next mayor. But you are not satisfied with your research just yet, a question remains : why? What could have cause this large drop in gun violence in one of the world's major cities ?
+
+Could this be a story of economic development in poor neighborhoods, taking people out of precarity and thus reducing violent crime ?
+
+```{r include=FALSE}
+#| message=FALSE
+
+# loading the shape file of NYC's neighborhoods
+nyc_nta <- st_read("data/nynta2010_23d/nynta2010.shp")
+
+# loading indicators data
+NTA_data <- vroom("data/DRI_Subindices_Indicators.csv")
+```
+
+```{r}
+# adding spatial coordinates to the displacement risk data
+NTA_data <- NTA_data |> left_join(nyc_nta, join_by(NTACode)) 
+```
+
+```{r}
+ggplot() +
+  geom_sf(data = NTA_data, aes(geometry=geometry, fill=`DisplacementRiskIndex`)) +
+  labs(title = "Displacement risk index 2022")
+```
+
+"Good question", they answer, "The displacement risk index, which acts as a proxy for the level of precarity of a neighborhood, might give us a clue as to what happened in these three specific areas. Firstly, you have the east Queen area, which shows a low displacement risk index in 2022. This might be a signal that the neighborhood went trough a gentrification process prior to 2022 which took it out of precarity. This can not be confirmed, it is simply an indicator. More interesting is to look at the other two areas (South east Brooklyn and the Bronx, the most violent neighborhoods in the city) which still in 2022 indicate a high level of displacement risk, showing it is likely that the cause behind the strong decrease in these two areas is not an economic development that took vulnerable populations out of precarity."
+
+Interesting, you tell yourself. Then what might be the cause of the decrease in shooting incidents in those neighborhoods? Is it a result of policy ?
+
+"This is the most convincing hypothesis we have", your friends tell you. "Here is a visualization of the overall evolution in shootings during each of the city mayors' terms of office"
+
+```{r}
+mayors <- clean_data |>
+  select(OCCUR_DATE) |>
+  mutate('year'=year(OCCUR_DATE))|>
+  group_by(year)|>
+  summarise('Number of shootings'= n()) |>
+  ggplot(aes(x=year, y=`Number of shootings`)) +
+    geom_line() + 
+    geom_point() +
+    scale_x_continuous(breaks=c(seq(2006,2022,by=1))) +
+    labs(title="Number of shooting incidents in NYC over the years ") +
+    geom_vline(xintercept = 2013, color = "red") +
+    geom_vline(xintercept = 2021, color = "red")
+
+Bloomberg_img <- readPNG("Bloomberg.png", native = TRUE)
+DeBlasio_img <- readPNG("deblasio.png", native = TRUE)
+Adams_img <- readPNG("adams.png", native = TRUE)
+
+mayors_img <- mayors +                   
+  inset_element(p = Bloomberg_img, 
+                left = 0.1, 
+                bottom = 0.5, 
+                right = 0.2, 
+                top = 0.35) +                   
+  inset_element(p = DeBlasio_img, 
+                left = 0.6, 
+                bottom = 0.6, 
+                right = 0.7, 
+                top = 0.75) +                   
+  inset_element(p = Adams_img,
+                left = 0.91, 
+                bottom = 0.15, 
+                right = 0.98, 
+                top = 0.6)
+
+print(mayors_img)
+```
+
+Michael R. Bloomberg, 2003-2013
+
+Bill de Blasio, 2014-2021
+
+Eric L. Adams, 2022-present
+
+"In 2006, then mayor Michael R. Bloomberg created [*Mayors Against Illegal Guns*](https://nationaldmo.org/about/advisoryboard/dmo_maig/)*,* a coalition aiming to reduce the possession and use of illegal firearms in the city. As a result, in 2012, a [record low](https://www.nbcnewyork.com/news/local/nyc-murder-rate-record-low-crime-stats-nypd/2095430/) number of shootings was recorded. This was not cause for unanimous celebration do to the controversial nature of the then active infamous 'stop-and-frisk' strategy employed by police officers.
+
+His successor, Bill De Blasio, continued those efforts to reduce gun violence by [joining the coalition](https://www.cbsnews.com/newyork/news/de-blasio-joins-mayors-against-illegal-guns-pledges-aggressive-action/). However, during the pandemic shooting rates increased dramatically and De Blasio was [heavily criticized](https://nypost.com/2021/06/07/bill-de-blasio-offers-no-solution-to-surging-gun-violence/) for not offering convincing solutions to stop the outbreak.
+
+Appointed mayor in 2022, Eric El Adams, made gun violence control a priority naming bringing in his own '[gun czar](https://www.thecity.nyc/2022/06/02/eric-adams-andre-mitchell-man-up-gun-czar/)' and passing [two crucial bills](https://www.nyc.gov/office-of-the-mayor/news/735-22/mayor-adams-signs-two-bills-dam-additional-rivers-feeding-sea-gun-violence#/0) to address the flow of illegal weapons into the city."
+
+## Conclusion
+
+Having learned about the recent history and sociodemographic patterns of New York City's shooting incidents, and of the effectiveness of illegal firearms control policies, you are more determined than ever to become the next great mayor of the City of Bright Lights.
