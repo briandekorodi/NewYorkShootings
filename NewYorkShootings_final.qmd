@@ -97,9 +97,8 @@ raw_data <- vroom("data/NYPD_Shooting_Incident_Data__Historic.csv")
 
 ## Data Cleaning
 
-We create a new dataset on which we will implement our cleaning steps.
-
 ```{r}
+# We create a new dataset on which we will implement our cleaning steps.
 clean_data <- raw_data
 ```
 
@@ -330,9 +329,7 @@ clean_data |>
   labs(title = "Locations of shooting incidents in New York City", subtitle="2006-2022")
 ```
 
-![*Map of New York City*](NYC_Map.png){fig-align="center" width="554" height="455"}
-
-Nothing illustrates the tight link between New York City and its history of gun violence quite like the near reproduction of the city map simply by plotting all shooting incidents according to their geographical coordinates.
+Nothing illustrates the tight link between New York City and its history of gun violence quite like the near reproduction of the city map simply by plotting all shooting incidents according to their geographical coordinates. See @fig-NYC in annex for a reference map of NYC.
 
 On this note, we will attempt to further deconstruct the patterns behind this remarkable data.
 
@@ -805,3 +802,5 @@ The main data set, which is an historic of all shooting incidents that happened 
 To display the shooting incidents on the map of NYC, it was joined with a [shape file of NYC precincts](https://data.cityofnewyork.us/Public-Safety/Police-Precincts/78dh-3ptz), using the common column "precinct".
 
 To produce the map of the Displacement Risk Index in NYC (2022), data from the [Displacement Risk Map of NYC](https://equitableexplorer.planning.nyc.gov/map/drm/nta) was used.
+
+![*Map of New York City*](NYC_Map.png){#fig-NYC}
