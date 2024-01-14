@@ -604,7 +604,7 @@ clean_data |>
     labs(title="Number of shooting incidents by precinct over the years", subtitle="Violent tier, 2006-2019")
 ```
 
-Notice that none of the 14 most violent NYC police precincts belong to Manhattan or Staten Island. These precincts saw a significant drop in shooting incidents overall (about 50%), that took off in 2011.
+Notice that few of the 14 most violent NYC police precincts belong to Manhattan or Staten Island. These precincts saw a significant drop in shooting incidents overall (about 50%), that took off in 2011.
 
 ```{r warning=FALSE}
 #| message=FALSE
@@ -785,5 +785,15 @@ His successor, Bill De Blasio, continued those efforts to reduce gun violence by
 Appointed mayor in 2022, Eric El Adams, made gun violence control a priority naming bringing in his own '[gun czar](https://www.thecity.nyc/2022/06/02/eric-adams-andre-mitchell-man-up-gun-czar/)' and passing [two crucial bills](https://www.nyc.gov/office-of-the-mayor/news/735-22/mayor-adams-signs-two-bills-dam-additional-rivers-feeding-sea-gun-violence#/0) to address the flow of illegal weapons into the city."
 
 ## Conclusion
+
+Thanks to your new acquaintances from Dauphine, you learned about important features and patterns of New York City shooting incidents from 2006 to 2022.
+
+First, a breakdown of the distribution of shooting incidents by time, month of the year, as well as sex and racial and age groups of victims and offenders was presented.
+
+Notable insights are that more shootings happen at night and during the summer, men and black people in general are far more likely to be involved in incidents than others, and it is adults below the age of 44 that are involved in the vast majority of gun violence occurrences.
+
+Next, the city-wide trends in number of shooting incidents were put forward. Putting aside the dramatic spike in 2020 aside, which can almost certainly be explained by the Covid pandemic, the strong decreasing trend between 2006 and 2019 was presented. The overall numbers were decomposed into borough and precinct numbers, showing that gun violence decreased at similar rates at all levels, but naturally the strong decrease in the most violent areas of the city had the strongest influence on the overall numbers.
+
+One possible explanation for the decrease in shooting among the most violent areas might be gentrification. This might be a clue for the East Queens area, however the other two most violent zones in the city still show precariously high risk displacement indexes today. This might indicate that they are safer not because of economic development, but because of policy, in particular the mayors' attempts to control the flow of illegal firearms into the city.
 
 Having learned about the recent history and sociodemographic patterns of New York City's shooting incidents, and of the effectiveness of illegal firearms control policies, you are more determined than ever to become the next great mayor of the City of Bright Lights.
