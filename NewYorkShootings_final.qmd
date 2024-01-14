@@ -656,7 +656,7 @@ clean_data |>
     labs(title="Number of shooting incidents by precinct over the years", subtitle="Least violent tier, 2006-2019")
 ```
 
-While all groups saw a significant decrease in shootings over the given time span, the decreases in the two most violent groups account for most of the overall city-wide change.
+While all groups saw a significant decrease in shootings over the given time span, it is the decreases in the two most violent groups that account for most of the overall city-wide change.
 
 It also seems that most in-group outliers have disappeared. The difference in violence between precincts has strongly diminished. The absolute most violent single precincts in New York City became much safer. This evolution can be visualized with the use of a map:
 
