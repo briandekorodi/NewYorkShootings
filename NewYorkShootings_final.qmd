@@ -15,10 +15,6 @@ We have found certified data with detailed descriptive characteristics of all re
 
 This method, combining descriptive data with contextual information, we hope, will allow us to determine to what extent gun violence incidents are random events, or whether they may be partially explained by larger social and economic forces.
 
-## Click [here](https://github.com/briandekorodi/NewYorkShootings) to access the Github repository
-
-## Click [here](https://catalog.data.gov/dataset/nypd-shooting-incident-data-historic/resource/c564b578-fd8a-4005-8365-34150d306cc4) to access the source
-
 ## Description of the source
 
 The data, found in the official United States open data website, constitutes a list of every New York City shooting incident, reported by the NYPD, from January 1, 2006 to Decemeber 31, 2022. This data is manually extracted every quarter and reviewed by the Office of Management Analysis and Planning before being posted on the NYPD website.
@@ -599,7 +595,7 @@ clean_data |>
   ggplot(aes(x=year, y=`Number of shootings`, group=PRECINCT, color=BORO)) +
     geom_line() + 
     geom_point() +
-    geom_smooth(aes(group = 1), method = "lm", formula = y ~ x) +
+    geom_smooth(aes(group = 1), formula = y ~ x) +
     scale_x_continuous(breaks=c(seq(2006,2022,by=2))) +
     labs(title="Number of shooting incidents by precinct over the years", subtitle="Violent tier, 2006-2019")
 ```
